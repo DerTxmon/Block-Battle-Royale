@@ -25,6 +25,7 @@ public class Bot_Optimazation : MonoBehaviour
         Kisten_Links = GameObject.FindGameObjectsWithTag("Kiste_Links");
         Gebäude = GameObject.FindGameObjectsWithTag("Gebäude");
 
+
         StartCoroutine(RegisterItems());
         StartCoroutine(Check());        
     }
@@ -54,7 +55,7 @@ public class Bot_Optimazation : MonoBehaviour
                 }
             }
             //Player
-            if(Vector2.Distance(Player.transform.position, this.gameObject.transform.position) < 50f){
+            if(Vector2.Distance(Player.transform.position, this.gameObject.transform.position) < 70f){
                 is_object_in_range = true;
                 goto end;
             }else{

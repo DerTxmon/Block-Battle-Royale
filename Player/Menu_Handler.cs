@@ -7,7 +7,7 @@ using System;
 
 public class Menu_Handler : MonoBehaviour
 {
-    public GameObject Player, Shop_Button, Play_Button, Friends_Button, Inv_Button, Coin_Counter, Player_Name_Button, Name_Input, BG1, BG2, BG3, BG4, Logo, Settings_Button, Settings_BG, Settings_Menu;
+    public GameObject Player, Shop_Button, Play_Button, Friends_Button, Inv_Button, Coin_Counter, Player_Name_Button, Name_Input, BG1, BG2, BG3, BG4, Logo, Settings_Button, Settings_BG, Settings_Menu, Settings_Menu_X;
     public GameObject LobbyMusic, Settings_X;
     public Text Coin_Count, Player_Name_Text, Bot_Counter;
     public GameObject[] BGPoints;
@@ -16,7 +16,7 @@ public class Menu_Handler : MonoBehaviour
     public static int Menu_Bots = 0;
     public float CAMSPEED = 0.001f;
     public float Playerspinspeed;
-    public static bool performancemode = true;
+    public static bool performancemode = false;
 
     void Awake(){
         ChooseBG();
@@ -160,7 +160,7 @@ public class Menu_Handler : MonoBehaviour
 
     public void StartGame(){
         //Load the Game
-        SceneManager.LoadScene(sceneName:"Game");
+        SceneManager.LoadScene(sceneName:"Dropoff");
     }
 
     public void AddBot(){
@@ -185,6 +185,7 @@ public class Menu_Handler : MonoBehaviour
         Name_Input.SetActive(false);
         Settings_Button.gameObject.SetActive(false);
 
+        Settings_Menu_X.gameObject.SetActive(true);
         Settings_Menu.gameObject.SetActive(true);
     }
 
@@ -201,6 +202,7 @@ public class Menu_Handler : MonoBehaviour
         Name_Input.SetActive(false);
         Settings_Button.gameObject.SetActive(true);
 
+        Settings_Menu_X.gameObject.SetActive(false);
         Settings_Menu.gameObject.SetActive(false);
     }
 

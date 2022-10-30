@@ -15,35 +15,35 @@ public class Plane_Fly : MonoBehaviour
         yield return new WaitForSeconds(FlugzeugStartTime); //Flugzeug wartet auf Start
         Debug.Log("Flugzeug startet");
         for(int i = 0; i != 694; i++){
-            this.gameObject.transform.Translate(Vector3.up * 0.018f,Space.Self);
+            this.gameObject.transform.Translate(Vector3.up * 0.0198f,Space.Self);//
             yield return new WaitForSeconds(0.007f);
         }
 
         for(int i = 0; i < 180; i++){
             rb.rotation += 0.25f;
-            this.gameObject.transform.Translate(Vector3.up * 0.05f,Space.Self);
+            this.gameObject.transform.Translate(Vector3.up * 0.055f,Space.Self);
             yield return new WaitForSeconds(0.02f);
         }
 
         for(int i = 0; i != 4493; i++){
-            this.gameObject.transform.Translate(Vector3.up * 0.018f,Space.Self);
+            this.gameObject.transform.Translate(Vector3.up * 0.0198f,Space.Self);//
             yield return new WaitForSeconds(0.007f);
         }
 
         for(int i = 0; i < 180; i++){
             rb.rotation -= 0.25f;
-            this.gameObject.transform.Translate(Vector3.up * 0.05f,Space.Self);
+            this.gameObject.transform.Translate(Vector3.up * 0.055f,Space.Self);
             yield return new WaitForSeconds(0.02f);
         }
 
         for(int i = 0; i < 180; i++){
             rb.rotation -= 0.25f;
-            this.gameObject.transform.Translate(Vector3.up * 0.041f,Space.Self);
+            this.gameObject.transform.Translate(Vector3.up * 0.0451f,Space.Self);
             yield return new WaitForSeconds(0.02f);
         }
 
         for(int i = 0; i != 69; i++){
-            this.gameObject.transform.Translate(Vector3.up * 0.018f,Space.Self);
+            this.gameObject.transform.Translate(Vector3.up * 0.0198f,Space.Self);//
             yield return new WaitForSeconds(0.007f);
         }
 

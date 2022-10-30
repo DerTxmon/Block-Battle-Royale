@@ -12,9 +12,17 @@ public class UI_Handler : MonoBehaviour
     [SerializeField] GameObject MinimapCam;
     [SerializeField] GameObject Home_Button;
     private GameObject[] AllrenderableGameObjects;
+    [SerializeField] private GameObject Point;
 
     public void Start(){
        //AllrenderableGameObjects = FindObjectsOfType<Render_Manager>().Select(rm => rm.gameObject).ToArray();
+    }
+
+    private void FixedUpdate() {
+        //Minimap Punkt synchron halten
+        float PointX = transform.position.x / 7f; //Aktuelle Position durch Differenz zur minimap in real world to UI Verhältniss
+        float PointY = transform.position.y / 7f;
+        Point.GetComponent<RectTransform>().localPosition = new Vector3(PointX, PointY, 0f);
     }
 
     public void Mapbutton(){

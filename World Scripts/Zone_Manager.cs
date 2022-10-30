@@ -18,8 +18,10 @@ public class Zone_Manager : MonoBehaviour
     public bool TakingDamage;
     public float Zoneticktime = 1f;
     public bool InZone;
+    public int currentzonedamage = 2;
     private void Start() {
         StartCoroutine(ZoneDamage());
+        StartCoroutine(IncreaseZoneDMG());
     }
     private void Awake() {
         instance = this;
@@ -66,10 +68,17 @@ public class Zone_Manager : MonoBehaviour
         righttransform.localScale = new Vector3(2000, size.y);
         righttransform.localPosition = new Vector3(+lefttransform.localScale.x * .5f + size.x * .5f, 0f, -9.199997f);
     }
+
+    IEnumerator IncreaseZoneDMG(){
+        while(true){
+            yield return new WaitForSeconds(15f);
+            currentzonedamage += 5;
+        }
+    }
     IEnumerator ZoneDamage(){
         while (true){
             TakingDamage = true;
-            if(InZone == true) Player.GetComponent<Player_Health>().health -= 2;
+            if(InZone == true) Player.GetComponent<Player_Health>().Damage(currentzonedamage);
             TakingDamage = false;
             yield return new WaitForSeconds(Zoneticktime);
         }

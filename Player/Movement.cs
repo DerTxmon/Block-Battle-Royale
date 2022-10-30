@@ -44,11 +44,14 @@ public class Movement : MonoBehaviour
         }else{
             PostProcessingVolume.SetActive(true);
         }
+        //Setz den Player auf die im Dropoff Screen angegebene Position
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        Player.transform.position = new Vector3(Dropoff_Handler.DropoffX, Dropoff_Handler.DropoffY, 100f);
+        Debug.Log(Dropoff_Handler.DropoffX);
         Player_Name_Ingame = Menu_Handler.Player_Name;
         Name_Text.GetComponent<TextMeshPro>().text = Player_Name_Ingame;
         World = GameObject.Find("World");
@@ -107,13 +110,13 @@ public class Movement : MonoBehaviour
         begin:
         for( ;steping; ){
             Instantiate(Footsteps,new Vector3(transform.position.x, transform.position.y, 121f), transform.rotation);
-            yield return new WaitForSeconds(.3f);
+            yield return new WaitForSeconds(.2f);
             if(!steping) break;
             Instantiate(Footsteps2, new Vector3(transform.position.x, transform.position.y, 121f), transform.rotation);
-            yield return new WaitForSeconds(.3f);
+            yield return new WaitForSeconds(.2f);
         }
         if(!steping){
-            yield return new WaitForSeconds(.3f);
+            yield return new WaitForSeconds(.2f);
             goto begin;
         }
     }

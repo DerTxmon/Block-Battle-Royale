@@ -61,6 +61,7 @@ public class Bot_Behavior : MonoBehaviour
         Bot_Name_Text_rb = Bot_Name_Text.GetComponent<Rigidbody2D>();
         Bot_Name_Text_transform = Bot_Name_Text.GetComponent<RectTransform>();
         bot_shoot = Bot.GetComponent<Bot_Shoot>();
+        Bot_Healthbar_rb = Healthbar.GetComponent<Rigidbody2D>();
     }
     void Start()
     {
@@ -81,7 +82,7 @@ public class Bot_Behavior : MonoBehaviour
 
         //Healthbar bleibt rechts
         Bot_Healthbar_rb.rotation = 0;
-        Healthbar.transform.position = new Vector2(this.transform.position.x + 1.5f, this.transform.position.y);
+        Healthbar.transform.position = new Vector2(this.transform.position.x + .5f, this.transform.position.y);
 
         //Setzt die summen in eine Array ein, damit sie später ausgewertet werden können
         /*sums[0] = rightsum;
@@ -200,14 +201,14 @@ public class Bot_Behavior : MonoBehaviour
         while(steping){
             if(spawn_steps){ //Mache nur footsteps wenn der Spieler auch nah genug ist um sie in den nächsten 5-10 sekunden zu sehen
                 Instantiate(Footsteps,new Vector3(transform.position.x, transform.position.y, 113f), transform.rotation);
-                yield return new WaitForSeconds(.3f);
+                yield return new WaitForSeconds(.2f);
                 if(!steping) break;
                 Instantiate(Footsteps2, new Vector3(transform.position.x, transform.position.y,113f), transform.rotation);
             }
-            yield return new WaitForSeconds(.3f);
+            yield return new WaitForSeconds(.2f);
         }
         if(!steping){
-            yield return new WaitForSeconds(.3f);
+            yield return new WaitForSeconds(.2f);
             goto begin;
         }
     }
@@ -353,11 +354,11 @@ public class Bot_Behavior : MonoBehaviour
                 }
             }
 
-            if(EnemyContact == true && Enemy != null) movenormal = false;
+            if(EnemyContact && Enemy != null) movenormal = false;
             //Random Waffe raus hohlen und dann schießen.
             if(!runaway){ //Nur wenn er nicht wegläuft schiessen sonst schießt er ins nichts
             StartCoroutine(bot_shoot.Shoot()); //Schießen
-            if(schleifeny <= 1) schleifeny++;
+            if(schleifeny <= 1 && Bot.GetComponent<Bot_Inventory>().lootcount > 0) schleifeny++;
             if(schleifeny == 1){
                 randomizerweaponmax = Bot.GetComponent<Bot_Inventory>().lootcount;
                 randomizerweapon = Random.Range(1, randomizerweaponmax);
