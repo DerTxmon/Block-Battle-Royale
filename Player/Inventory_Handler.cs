@@ -59,8 +59,8 @@ public class Inventory_Handler : MonoBehaviour
     [SerializeField] public GameObject Glock_18_Item, M4_Item, AK_47_Item, Sniper_Item, Slot1_GameObject, Slot2_GameObject, Slot3_GameObject;
     [SerializeField] private Sprite Placeholder;
     private Animator animator;
+    public int Kills;
 
-    // Start is called before the first frame update
     void Start()
     {
         Healtxt = GameObject.Find("Heal_Count").GetComponent<Text>();

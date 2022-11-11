@@ -50,7 +50,7 @@ public class Kiste_Check : MonoBehaviour
             //Lootbutton
             if(collision.gameObject.tag == "Player"){
                 Lootbtn.GetComponent<Image>().enabled = false;
-            Lootbtn.GetComponent<Button>().enabled = false;
+                Lootbtn.GetComponent<Button>().enabled = false;
             }
             Contact = false;
             open = false;

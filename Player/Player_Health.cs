@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Player_Health : MonoBehaviour
 {
@@ -10,7 +11,11 @@ public class Player_Health : MonoBehaviour
     public Text Lebenstext;
     private GameObject World;
     public GameObject Healthbar;
-    // Start is called before the first frame update
+    public UI_Handler UI;
+    
+    void Awake(){
+        UI = gameObject.GetComponent<UI_Handler>();
+    }
     void Start()
     {
         health = 200f;
@@ -23,8 +28,7 @@ public class Player_Health : MonoBehaviour
         health -= Dmg;
         //Check for death
         if(health <= 0){
-            Destroy(this.gameObject);
-            Time.timeScale = 0;
+            Death();
         }
         //UI Update
         Lebenstext.text = health.ToString() + "%";
@@ -34,5 +38,9 @@ public class Player_Health : MonoBehaviour
         }else{
             Healthbar.GetComponent<Image>().color = Color.green;
         }
+    }
+
+    public void Death(){
+        UI.EndScreen();
     }
 }

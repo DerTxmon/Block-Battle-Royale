@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
+using System.IO;
 
 public class Menu_Handler : MonoBehaviour
 {
@@ -17,14 +18,43 @@ public class Menu_Handler : MonoBehaviour
     public float CAMSPEED = 0.001f;
     public float Playerspinspeed;
     public static bool performancemode = false;
+    public Image Black;
+    public LocalData localdata = new LocalData(); //Sofort das Localdata object erstellen damit sofort zum launch des spiels daten gelesen/geschrieben werden können
+    public LocalData loadeddata;
 
     void Awake(){
+        Readdata(); //Init Saved Data
+        Writedata();
+
         ChooseBG();
         StartCoroutine(PlayerSpin());
         StartCoroutine(BGMove());
         StartCoroutine(ButtonAnimation());
-        Refresh_CoinCounter();
     }
+
+    public void Writedata(){
+        if(File.Exists(Application.dataPath + "/save.json")){
+            string json = JsonUtility.ToJson(localdata);
+            File.WriteAllText(Application.dataPath + "/save.json", json);
+        }else Debug.Log("Error. Couldn't find Save File");
+    }
+
+    public void Readdata(){
+        if(File.Exists(Application.dataPath + "/save.json")){
+            string json = File.ReadAllText(Application.dataPath + "/save.json");
+            loadeddata = JsonUtility.FromJson<LocalData>(json);
+        }else Debug.Log("Error. Couldn't find Save File");
+    }
+    //User Saved Data Object
+    public class LocalData{
+        //Save Data
+        public string Saved_Player_Name;
+        public int Saved_Coins;
+        public int Wins;
+        public int Kills;
+        public int PlayerID; //Web Server teilt einmalig zu und wird ab dann nur noch gelesen.
+    }
+
     public void ChooseBG(){
         int BGnum = UnityEngine.Random.Range(0,4);
         if(BGnum == 0){
@@ -151,11 +181,15 @@ public class Menu_Handler : MonoBehaviour
     }
 
     public void Refresh_CoinCounter(){
-        Coin_Count.GetComponent<Text>().text = Coins.ToString();
+        Coin_Count.GetComponent<Text>().text = localdata.Saved_Coins.ToString();
+        Writedata();
     }
 
     public void Refresh_PlayerName(){
         Player_Name_Text.GetComponent<Text>().text = Player_Name;
+        //Write to save variable
+        localdata.Saved_Player_Name = Player_Name;
+        Writedata();
     }
 
     public void StartGame(){

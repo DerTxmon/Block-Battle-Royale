@@ -48,6 +48,7 @@ public class Shoot : MonoBehaviour
                 if(hitinfo.collider.gameObject.tag == "Player"){
                     hitinfo.collider.GetComponent<Player_Health>().Damage(15);
                 }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                    if(hitinfo.collider.GetComponent<Bot_Health>().health <= 15) gameObject.GetComponent<Inventory_Handler>().Kills++;
                     hitinfo.collider.GetComponent<Bot_Health>().Damage(15);
                 }
                 
@@ -88,10 +89,10 @@ public class Shoot : MonoBehaviour
                 Inv.small_ammo += 12;
                 Inv.slot1_mag_ammo = Inv.small_ammo;
                 Inv.small_ammo = 0;
-                yield return new WaitForSeconds (2.5f);
+                yield return new WaitForSeconds (2f);
                 goto reloadend;
             }
-            yield return new WaitForSeconds (2.5f);
+            yield return new WaitForSeconds (2f);
             Inv.slot1_mag_ammo += 12;
             reloadend:
             inreload = false;
@@ -108,6 +109,7 @@ public class Shoot : MonoBehaviour
                     if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(30);
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                        if(hitinfo.collider.GetComponent<Bot_Health>().health <= 30) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(30);
                     }
                 
@@ -168,6 +170,7 @@ public class Shoot : MonoBehaviour
                     if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(35);
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                        if(hitinfo.collider.GetComponent<Bot_Health>().health <= 35) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(35);
                     }
                 
@@ -226,6 +229,7 @@ public class Shoot : MonoBehaviour
                 if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(150);
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                        if(hitinfo.collider.GetComponent<Bot_Health>().health <= 150) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(150);
                     }
                 
@@ -286,6 +290,7 @@ public class Shoot : MonoBehaviour
                 if(hitinfo.collider.gameObject.tag == "Player"){
                     hitinfo.collider.GetComponent<Player_Health>().Damage(15);
                 }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                    if(hitinfo.collider.GetComponent<Bot_Health>().health <= 15) gameObject.GetComponent<Inventory_Handler>().Kills++;
                     hitinfo.collider.GetComponent<Bot_Health>().Damage(15);
                 }
                 
@@ -345,6 +350,7 @@ public class Shoot : MonoBehaviour
                     if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(30);
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                        if(hitinfo.collider.GetComponent<Bot_Health>().health <= 30) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(30);
                     }
                 
@@ -405,6 +411,7 @@ public class Shoot : MonoBehaviour
                     if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(35);
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                        if(hitinfo.collider.GetComponent<Bot_Health>().health <= 35) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(35);
                     }
                 
@@ -463,6 +470,7 @@ public class Shoot : MonoBehaviour
                 if(hitinfo.collider.gameObject.tag == "Player"){
                     hitinfo.collider.GetComponent<Player_Health>().Damage(150);
                 }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                    if(hitinfo.collider.GetComponent<Bot_Health>().health <= 150) gameObject.GetComponent<Inventory_Handler>().Kills++;
                     hitinfo.collider.GetComponent<Bot_Health>().Damage(150);
                 }
                 
@@ -523,6 +531,7 @@ public class Shoot : MonoBehaviour
                 if(hitinfo.collider.gameObject.tag == "Player"){
                     hitinfo.collider.GetComponent<Player_Health>().Damage(15);
                 }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                    if(hitinfo.collider.GetComponent<Bot_Health>().health <= 15) gameObject.GetComponent<Inventory_Handler>().Kills++;
                     hitinfo.collider.GetComponent<Bot_Health>().Damage(15);
                 }
                 
@@ -582,6 +591,7 @@ public class Shoot : MonoBehaviour
                     if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(30);
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                        if(hitinfo.collider.GetComponent<Bot_Health>().health <= 30) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(30);
                     }
                 
@@ -642,6 +652,7 @@ public class Shoot : MonoBehaviour
                     if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(35);
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                        if(hitinfo.collider.GetComponent<Bot_Health>().health <= 35) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(35);
                     }
                 
@@ -700,6 +711,7 @@ public class Shoot : MonoBehaviour
                 if(hitinfo.collider.gameObject.tag == "Player"){
                     hitinfo.collider.GetComponent<Player_Health>().Damage(150);
                 }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                    if(hitinfo.collider.GetComponent<Bot_Health>().health <= 150) gameObject.GetComponent<Inventory_Handler>().Kills++;
                     hitinfo.collider.GetComponent<Bot_Health>().Damage(150);
                 }
                 
@@ -790,17 +802,19 @@ public class Shoot : MonoBehaviour
     public IEnumerator reload(){
         if(Inv.Slot1_Selected){
         //Reload Glock-18
-        if(inreload == false && Inv.Glock_18_Selected == true && isshooting == false && Inv.slot1_mag_ammo != 12 && Inv.slot1_mag_ammo != 0){
+        if(Inv.slot1_mag_ammo != 12 && inreload == false && Inv.small_ammo > 0 && Inv.Glock_18_Selected == true && isshooting == false){
             inreload = true;
-            yield return new WaitForSeconds(2f);
-            Inv.small_ammo += Inv.slot1_mag_ammo;
-            if(Inv.small_ammo >= 12){
-                Inv.slot1_mag_ammo = 12;
-                Inv.small_ammo -= 12;
-            }else if(Inv.small_ammo < 12){
+            Inv.small_ammo -= 12;
+            if(Inv.small_ammo < 0){
+                Inv.small_ammo += 12;
                 Inv.slot1_mag_ammo = Inv.small_ammo;
                 Inv.small_ammo = 0;
+                yield return new WaitForSeconds (2f);
+                goto reloadend;
             }
+            yield return new WaitForSeconds (2f);
+            Inv.slot1_mag_ammo += 12;
+            reloadend:
             inreload = false;
         }
 
@@ -851,17 +865,19 @@ public class Shoot : MonoBehaviour
     }
     else if(Inv.Slot2_Selected){
         //Reload Glock-18
-        if(inreload == false && Inv.Glock_18_Selected == true && isshooting == false && Inv.slot2_mag_ammo != 12 && Inv.slot2_mag_ammo != 0){
+        if(Inv.slot2_mag_ammo != 12 && inreload == false && Inv.small_ammo > 0 && Inv.Glock_18_Selected == true && isshooting == false){
             inreload = true;
-            yield return new WaitForSeconds(2f);
-            Inv.small_ammo += Inv.slot2_mag_ammo;
-            if(Inv.small_ammo >= 12){
-                Inv.slot2_mag_ammo = 12;
-                Inv.small_ammo -= 12;
-            }else if(Inv.small_ammo < 12){
+            Inv.small_ammo -= 12;
+            if(Inv.small_ammo < 0){
+                Inv.small_ammo += 12;
                 Inv.slot2_mag_ammo = Inv.small_ammo;
                 Inv.small_ammo = 0;
+                yield return new WaitForSeconds (2f);
+                goto reloadend;
             }
+            yield return new WaitForSeconds (2f);
+            Inv.slot2_mag_ammo += 12;
+            reloadend:
             inreload = false;
         }
 

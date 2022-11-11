@@ -50,7 +50,7 @@ public class Movement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Player.transform.position = new Vector3(Dropoff_Handler.DropoffX, Dropoff_Handler.DropoffY, 100f);
+        if(Dropoff_Handler.DropoffX != 0 || Dropoff_Handler.DropoffY != 0) Player.transform.position = new Vector3(Dropoff_Handler.DropoffX, Dropoff_Handler.DropoffY, 100f);//if statement nur für in editor bequemlichkeit
         Debug.Log(Dropoff_Handler.DropoffX);
         Player_Name_Ingame = Menu_Handler.Player_Name;
         Name_Text.GetComponent<TextMeshPro>().text = Player_Name_Ingame;
@@ -73,9 +73,9 @@ public class Movement : MonoBehaviour
         float X = joystick1.Horizontal;
         float Y = joystick1.Vertical;
 
-        Vector2 movementDir = new Vector2(X,Y);
+        Vector2 movementDir = new Vector2(X  * speed * Time.fixedDeltaTime, Y  * speed * Time.fixedDeltaTime);
 
-        transform.Translate(movementDir * speed * Time.fixedDeltaTime, Space.World);
+        transform.Translate(movementDir, Space.World);
 
         
         if(transform.position != lastpos){

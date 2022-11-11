@@ -13,9 +13,13 @@ public class UI_Handler : MonoBehaviour
     [SerializeField] GameObject Home_Button;
     private GameObject[] AllrenderableGameObjects;
     [SerializeField] private GameObject Point;
+    private Menu_Handler Menu;
+    private Inventory_Handler Inv;
 
     public void Start(){
        //AllrenderableGameObjects = FindObjectsOfType<Render_Manager>().Select(rm => rm.gameObject).ToArray();
+       Menu = gameObject.GetComponent<Menu_Handler>();
+       Inv = gameObject.GetComponent<Inventory_Handler>();
     }
 
     private void FixedUpdate() {
@@ -59,5 +63,11 @@ public class UI_Handler : MonoBehaviour
     public void BacktoHome(){
         Time.timeScale = 1;
         SceneManager.LoadScene(sceneName:"Title_Menu");
+    }
+    public void EndScreen(){
+        //Save Stats to save.json
+        Menu.localdata.Kills = Menu.loadeddata.Kills + Inv.Kills; //Scenen Übergreifend. Muss statisch sein. Workaround needed
+        Menu.localdata.Saved_Coins = Menu.loadeddata.Saved_Coins + Inv.Kills;
+        Menu.Writedata();
     }
 }
