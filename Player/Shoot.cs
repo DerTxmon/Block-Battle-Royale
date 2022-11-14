@@ -18,11 +18,13 @@ public class Shoot : MonoBehaviour
     [SerializeField] private LineRenderer lineRenderer;
     public LayerMask layerMask;
     private Color impactobjectcolor;
+    public static int Damage_dealt;
 
     // Start is called before the first frame update
     void Start()
     {
         Inv = Player.GetComponent<Inventory_Handler>();
+        Damage_dealt = 0;
     }
 
     // Update is called once per frame
@@ -47,9 +49,11 @@ public class Shoot : MonoBehaviour
             if(hitinfo){
                 if(hitinfo.collider.gameObject.tag == "Player"){
                     hitinfo.collider.GetComponent<Player_Health>().Damage(15);
+                    Damage_dealt += 15;
                 }else if(hitinfo.collider.gameObject.tag == "Bot"){
                     if(hitinfo.collider.GetComponent<Bot_Health>().health <= 15) gameObject.GetComponent<Inventory_Handler>().Kills++;
                     hitinfo.collider.GetComponent<Bot_Health>().Damage(15);
+                    Damage_dealt += 15;
                 }
                 
                 //Einschuss Animation (Blut)
@@ -108,9 +112,11 @@ public class Shoot : MonoBehaviour
                 if(hitinfo){
                     if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(30);
+                        Damage_dealt += 30;
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
                         if(hitinfo.collider.GetComponent<Bot_Health>().health <= 30) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(30);
+                        Damage_dealt += 30;
                     }
                 
                     //Einschuss Animation (Blut)
@@ -169,9 +175,11 @@ public class Shoot : MonoBehaviour
                 if(hitinfo){
                     if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(35);
+                        Damage_dealt += 35;
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
                         if(hitinfo.collider.GetComponent<Bot_Health>().health <= 35) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(35);
+                        Damage_dealt += 35;
                     }
                 
                     //Einschuss Animation (Blut)
@@ -228,9 +236,11 @@ public class Shoot : MonoBehaviour
             if(hitinfo){
                 if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(150);
+                        Damage_dealt += 150;
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
                         if(hitinfo.collider.GetComponent<Bot_Health>().health <= 150) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(150);
+                        Damage_dealt += 150;
                     }
                 
                 //Einschuss Animation (Blut)
@@ -289,6 +299,7 @@ public class Shoot : MonoBehaviour
             if(hitinfo){
                 if(hitinfo.collider.gameObject.tag == "Player"){
                     hitinfo.collider.GetComponent<Player_Health>().Damage(15);
+                    Damage_dealt += 15;
                 }else if(hitinfo.collider.gameObject.tag == "Bot"){
                     if(hitinfo.collider.GetComponent<Bot_Health>().health <= 15) gameObject.GetComponent<Inventory_Handler>().Kills++;
                     hitinfo.collider.GetComponent<Bot_Health>().Damage(15);
@@ -349,9 +360,11 @@ public class Shoot : MonoBehaviour
                 if(hitinfo){
                     if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(30);
+                        Damage_dealt += 30;
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
                         if(hitinfo.collider.GetComponent<Bot_Health>().health <= 30) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(30);
+                        Damage_dealt += 30;
                     }
                 
                     //Einschuss Animation (Blut)
@@ -410,9 +423,11 @@ public class Shoot : MonoBehaviour
                 if(hitinfo){
                     if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(35);
+                        Damage_dealt += 35;
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
                         if(hitinfo.collider.GetComponent<Bot_Health>().health <= 35) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(35);
+                        Damage_dealt += 35;
                     }
                 
                     //Einschuss Animation (Blut)
@@ -469,9 +484,11 @@ public class Shoot : MonoBehaviour
             if(hitinfo){
                 if(hitinfo.collider.gameObject.tag == "Player"){
                     hitinfo.collider.GetComponent<Player_Health>().Damage(150);
+                    Damage_dealt += 150;
                 }else if(hitinfo.collider.gameObject.tag == "Bot"){
                     if(hitinfo.collider.GetComponent<Bot_Health>().health <= 150) gameObject.GetComponent<Inventory_Handler>().Kills++;
                     hitinfo.collider.GetComponent<Bot_Health>().Damage(150);
+                    Damage_dealt += 150;
                 }
                 
                 //Einschuss Animation (Blut)
@@ -530,6 +547,7 @@ public class Shoot : MonoBehaviour
             if(hitinfo){
                 if(hitinfo.collider.gameObject.tag == "Player"){
                     hitinfo.collider.GetComponent<Player_Health>().Damage(15);
+                    Damage_dealt += 15;
                 }else if(hitinfo.collider.gameObject.tag == "Bot"){
                     if(hitinfo.collider.GetComponent<Bot_Health>().health <= 15) gameObject.GetComponent<Inventory_Handler>().Kills++;
                     hitinfo.collider.GetComponent<Bot_Health>().Damage(15);
@@ -590,9 +608,11 @@ public class Shoot : MonoBehaviour
                 if(hitinfo){
                     if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(30);
+                        Damage_dealt += 30;
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
                         if(hitinfo.collider.GetComponent<Bot_Health>().health <= 30) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(30);
+                        Damage_dealt += 30;
                     }
                 
                     //Einschuss Animation (Blut)
@@ -651,9 +671,11 @@ public class Shoot : MonoBehaviour
                 if(hitinfo){
                     if(hitinfo.collider.gameObject.tag == "Player"){
                         hitinfo.collider.GetComponent<Player_Health>().Damage(35);
+                        Damage_dealt += 35;
                     }else if(hitinfo.collider.gameObject.tag == "Bot"){
                         if(hitinfo.collider.GetComponent<Bot_Health>().health <= 35) gameObject.GetComponent<Inventory_Handler>().Kills++;
                         hitinfo.collider.GetComponent<Bot_Health>().Damage(35);
+                        Damage_dealt += 35;
                     }
                 
                     //Einschuss Animation (Blut)
@@ -710,9 +732,11 @@ public class Shoot : MonoBehaviour
             if(hitinfo){
                 if(hitinfo.collider.gameObject.tag == "Player"){
                     hitinfo.collider.GetComponent<Player_Health>().Damage(150);
+                    Damage_dealt += 150;
                 }else if(hitinfo.collider.gameObject.tag == "Bot"){
                     if(hitinfo.collider.GetComponent<Bot_Health>().health <= 150) gameObject.GetComponent<Inventory_Handler>().Kills++;
                     hitinfo.collider.GetComponent<Bot_Health>().Damage(150);
+                    Damage_dealt += 150;
                 }
                 
                 //Einschuss Animation (Blut)

@@ -78,11 +78,11 @@ public class Bot_Behavior : MonoBehaviour
     {
         //Name Bleibt überm Kopf
         Bot_Name_Text_rb.rotation = 0;
-        Bot_Name_Text_transform.position = new Vector2(this.gameObject.transform.position.x, this.gameObject.transform.position.y + 1.5f);
+        Bot_Name_Text_transform.position = new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y + 1.5f, 0);
 
         //Healthbar bleibt rechts
         Bot_Healthbar_rb.rotation = 0;
-        Healthbar.transform.position = new Vector2(this.transform.position.x + .5f, this.transform.position.y);
+        Healthbar.transform.position = new Vector3(this.transform.position.x + .5f, this.transform.position.y ,0);
 
         //Setzt die summen in eine Array ein, damit sie später ausgewertet werden können
         /*sums[0] = rightsum;

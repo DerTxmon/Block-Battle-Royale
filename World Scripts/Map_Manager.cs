@@ -5,7 +5,8 @@ using UnityEngine.UI;
 using UnityEngine.Experimental.Rendering.Universal;
 public class Map_Manager : MonoBehaviour
 {
-    public int Playercount;
+    public static int Playercount;
+    public static float SurvivedTime;
     private GameObject[] x;
     private int y = 1;
     public GameObject[] EntryPoints;
@@ -21,8 +22,12 @@ public class Map_Manager : MonoBehaviour
     [SerializeField] private GameObject Small_Ammo;
     [SerializeField] private GameObject Mid_Ammo;
     [SerializeField] private GameObject Big_Ammo;
+    private float minus;
+    public GameObject Player;
 
     void Awake(){
+        //Zeig schonmal die eingestellen Bots an damit das script im hintergrund schonmal zählen kann
+        GameObject.Find("PlayerCount").GetComponent<Text>().text = Menu_Handler.Menu_Bots.ToString();
         //Registriere alle Laternen in eine Array
         Laternen = GameObject.FindGameObjectsWithTag("Laternen");
         //Mache alle Lichter aus
@@ -31,6 +36,7 @@ public class Map_Manager : MonoBehaviour
         StartCoroutine(WorldTime());
         Waffen_Spawns = GameObject.FindGameObjectsWithTag("Waffen_Spawn"); //für SpawnItems()
         SpawnItems();
+        StartCoroutine(Counting());
     }
     void Start()
     {
@@ -43,6 +49,13 @@ public class Map_Manager : MonoBehaviour
         }
         //reset "y" für Update()
         y = 0;
+    }
+
+    private IEnumerator Counting(){
+        while(true){
+            yield return new WaitForSeconds(1f);
+            SurvivedTime += 1;
+        }
     }
 
     private IEnumerator WorldTime(){
@@ -78,13 +91,26 @@ public class Map_Manager : MonoBehaviour
 
     IEnumerator PlayerCheck(){
         while(true){
-        x =  GameObject.FindGameObjectsWithTag("Bot");
-        Playercount = x.Length;
-        x = GameObject.FindGameObjectsWithTag("Player");
-        Playercount += x.Length;
-        GameObject.Find("PlayerCount").GetComponent<Text>().text = Playercount.ToString();
-        yield return new WaitForSeconds(5f);
+        try{
+            x = GameObject.FindGameObjectsWithTag("Bot");
+            Playercount = x.Length;
+            x = GameObject.FindGameObjectsWithTag("Player");
+            Playercount += x.Length;
+            GameObject.Find("PlayerCount").GetComponent<Text>().text = Playercount.ToString();
+        }catch{}
+
+        if(Playercount == 1){
+            Win();
         }
+        if(Playercount <= 5){ //Wenn nur noch 5 Spieler leben check alle .5sec nach playercount
+            minus = -1.5f;
+        }
+        yield return new WaitForSeconds(2f + minus);
+        }
+    }
+
+    public void  Win(){
+        Player.GetComponent<UI_Handler>().EndScreen();
     }
 
     private void SpawnItems(){

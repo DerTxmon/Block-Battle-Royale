@@ -60,7 +60,15 @@ public class Inventory_Handler : MonoBehaviour
     [SerializeField] private Sprite Placeholder;
     private Animator animator;
     public int Kills;
+    private Text Small_Ammo_Reserve, Mid_Ammo_Reserve, Big_Ammo_Reserve, Ammo_Reserve, Ammo_Mag;
 
+    void Awake(){
+        Small_Ammo_Reserve = GameObject.Find("Small Ammo Reserve").GetComponent<Text>();
+        Mid_Ammo_Reserve = GameObject.Find("Mid Ammo Reserve").GetComponent<Text>();
+        Big_Ammo_Reserve = GameObject.Find("Big Ammo Reserve").GetComponent<Text>();
+        Ammo_Reserve = GameObject.Find("Ammo_Reserve").GetComponent<Text>();
+        Ammo_Mag =GameObject.Find("Ammo_Mag").GetComponent<Text>();
+    }
     void Start()
     {
         Healtxt = GameObject.Find("Heal_Count").GetComponent<Text>();
@@ -86,14 +94,16 @@ public class Inventory_Handler : MonoBehaviour
         if(Player_Heal == 6) Player_Heal -= 1;
         if(Player_Heal2 == 6) Player_Heal -= 1;
 
-        //Munition im UI anzeigen
-        GameObject.Find("Small Ammo Reserve").GetComponent<Text>().text = small_ammo.ToString();
-        GameObject.Find("Mid Ammo Reserve").GetComponent<Text>().text = mid_ammo.ToString();
-        GameObject.Find("Big Ammo Reserve").GetComponent<Text>().text = big_ammo.ToString(); 
+        try{
+            //Munition im UI anzeigen
+            Small_Ammo_Reserve.text = small_ammo.ToString();
+            Mid_Ammo_Reserve.text = mid_ammo.ToString();
+            Big_Ammo_Reserve.text = big_ammo.ToString(); 
 
-        //MagUI Funktion darstellen.
-        GameObject.Find("Ammo_Reserve").GetComponent<Text>().text = CurrentMaxAmmo.ToString();
-        GameObject.Find("Ammo_Mag").GetComponent<Text>().text = CurrentMag.ToString();
+            //MagUI Funktion darstellen.
+            Ammo_Reserve.text = CurrentMaxAmmo.ToString();
+            Ammo_Mag.text = CurrentMag.ToString();
+        }catch{}
 
         //Mag wird aufs Aktuelle gewechselt. Mann Könnte bei den Conditionen bei Problemen andere Waffen auf False setzen.
         if(Glock_18_Selected == true){

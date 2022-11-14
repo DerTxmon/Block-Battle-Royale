@@ -28,8 +28,10 @@ public class Player_Health : MonoBehaviour
         health -= Dmg;
         //Check for death
         if(health <= 0){
-            Death();
+            StartCoroutine(Death());
         }
+        //Korrigiere - Zahlen
+        if(health < 0 ) health = 0;
         //UI Update
         Lebenstext.text = health.ToString() + "%";
         Healthbar.GetComponent<Image>().fillAmount = health / Maxhealth;
@@ -40,7 +42,13 @@ public class Player_Health : MonoBehaviour
         }
     }
 
-    public void Death(){
-        UI.EndScreen();
+    public IEnumerator Death(){
+        //Langsam Zeit runter schrauben
+        while(Time.timeScale != .1f){
+            yield return new WaitForSeconds(.2f);
+            float applytotime = Time.timeScale -.1f;
+            Time.timeScale = (float)System.Math.Round(applytotime * 100) / 100;
+        }
+        StartCoroutine(UI.EndScreen());
     }
 }

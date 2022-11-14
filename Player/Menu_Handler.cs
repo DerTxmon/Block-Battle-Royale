@@ -19,20 +19,23 @@ public class Menu_Handler : MonoBehaviour
     public float Playerspinspeed;
     public static bool performancemode = false;
     public Image Black;
-    public LocalData localdata = new LocalData(); //Sofort das Localdata object erstellen damit sofort zum launch des spiels daten gelesen/geschrieben werden können
-    public LocalData loadeddata;
+    public static LocalData localdata = new LocalData(); //Sofort das Localdata object erstellen damit sofort zum launch des spiels daten gelesen/geschrieben werden können
+    public static LocalData loadeddata;
 
     void Awake(){
         Readdata(); //Init Saved Data
-        Writedata();
 
         ChooseBG();
         StartCoroutine(PlayerSpin());
         StartCoroutine(BGMove());
         StartCoroutine(ButtonAnimation());
+        //Set Saved Player name
+        Player_Name_Text.GetComponent<Text>().text = loadeddata.Saved_Player_Name;
+        //Set Saved Coins to display
+        Coin_Count.GetComponent<Text>().text = loadeddata.Saved_Coins.ToString();
     }
 
-    public void Writedata(){
+    public static void Writedata(){
         if(File.Exists(Application.dataPath + "/save.json")){
             string json = JsonUtility.ToJson(localdata);
             File.WriteAllText(Application.dataPath + "/save.json", json);
@@ -53,6 +56,11 @@ public class Menu_Handler : MonoBehaviour
         public int Wins;
         public int Kills;
         public int PlayerID; //Web Server teilt einmalig zu und wird ab dann nur noch gelesen.
+    }
+
+    public static void Initlocaldata(){
+        localdata.Kills = loadeddata.Kills;
+        //mit allen variablen...
     }
 
     public void ChooseBG(){
