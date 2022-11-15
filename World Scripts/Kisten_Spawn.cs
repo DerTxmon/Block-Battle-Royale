@@ -6,7 +6,7 @@ public class Kisten_Spawn : MonoBehaviour
 {
     public GameObject[] Kiste_Obenarr, Kiste_Untenarr, Kiste_Rechtsarr, Kiste_Linksarr;
     public GameObject Kiste_Oben, Kiste_Unten, Kiste_Rechts, Kiste_Links;
-    void Start()
+    void Awake()
     {
         Kiste_Untenarr =  GameObject.FindGameObjectsWithTag("Kiste_Unten");
         Kiste_Obenarr = GameObject.FindGameObjectsWithTag("Kiste_Oben");

@@ -12,31 +12,27 @@ public class Bot_Shoot : MonoBehaviour
     public bool inreload;
     [SerializeField] private GameObject Impactanimation;
     [SerializeField] private LineRenderer lineRenderer;
+    private Bot_Behavior bot_behavior;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         Inv = Bot.GetComponent<Bot_Inventory>();
+        bot_behavior = Bot.GetComponent<Bot_Behavior>();
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        if(Bot.GetComponent<Bot_Behavior>().Shoot == true){
-        StartCoroutine(Shoot());
-        }
-    }
 
-    IEnumerator Shoot(){
+    public IEnumerator Shoot(){
         //Glock-18
-        if(Bot.GetComponent<Bot_Inventory>().Glock_18_Selected == true && isshooting == false && Inv.slot1_mag_ammo > 0){
+        if(Inv.Glock_18_Selected == true && isshooting == false && Inv.slot1_mag_ammo > 0){
             isshooting = true;
             //Raycast schuss
             RaycastHit2D hitinfo = Physics2D.Raycast(Feuerpunkt.transform.position, Feuerpunkt.transform.up, 50f); //Glock schießt 50f weit
             if(hitinfo){
                 if(hitinfo.collider.gameObject.tag == "Player"){
-                    hitinfo.collider.gameObject.GetComponent<Player_Health>().health -= 15; //Player nimmt 15 Schaden
+                    hitinfo.collider.GetComponent<Player_Health>().Damage(15);
                 }else if(hitinfo.collider.gameObject.tag == "Bot"){
-                    hitinfo.collider.gameObject.GetComponent<Bot_Health>().health -= 15; //Bot nimmt 15 Schaden
+                    hitinfo.collider.GetComponent<Bot_Health>().Damage(15);
                 }
                 
                 //Einschuss Animation (Blut)
@@ -58,7 +54,7 @@ public class Bot_Shoot : MonoBehaviour
             isshooting = false;
         }
         //Reload Glock-18
-        if(Inv.slot1_mag_ammo == 0 && inreload == false && Inv.small_ammo > 0 && Bot.GetComponent<Bot_Inventory>().Glock_18_Selected == true && isshooting == false){
+        if(Inv.slot1_mag_ammo == 0 && inreload == false && Inv.small_ammo > 0 && Inv.Glock_18_Selected == true && isshooting == false){
             inreload = true;
             Inv.small_ammo -= 12;
             if(Inv.small_ammo < 0){
@@ -75,17 +71,17 @@ public class Bot_Shoot : MonoBehaviour
         }
         
         //Für Automatische Gewähre. (M4)
-        if(Bot.GetComponent<Bot_Inventory>().M4_Selected == true && isshooting == false && Inv.slot1_mag_ammo > 0){
+        if(Inv.M4_Selected == true && isshooting == false && Inv.slot1_mag_ammo > 0){
             isshooting = true;
             for( ; Inv.slot1_mag_ammo != 0 ; Inv.slot1_mag_ammo--){
                 //Raycast schuss
                 RaycastHit2D hitinfo = Physics2D.Raycast(Feuerpunkt.transform.position, Feuerpunkt.transform.up, 50f); //Glock schießt 50f weit
                 if(hitinfo){
                     if(hitinfo.collider.gameObject.tag == "Player"){
-                        hitinfo.collider.gameObject.GetComponent<Player_Health>().health -= 20; //Player nimmt 15 Schaden
-                    }else if(hitinfo.collider.gameObject.tag == "Bot"){
-                        hitinfo.collider.gameObject.GetComponent<Bot_Health>().health -= 20; //Bot nimmt 15 Schaden
-                    }
+                    hitinfo.collider.GetComponent<Player_Health>().Damage(30);
+                }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                    hitinfo.collider.GetComponent<Bot_Health>().Damage(30);
+                }
                 
                     //Einschuss Animation (Blut)
                     if(hitinfo.collider.gameObject.tag == "Player" || hitinfo.collider.gameObject.tag == "Bot"){
@@ -106,7 +102,7 @@ public class Bot_Shoot : MonoBehaviour
             isshooting = false;
         }
         //Reload M4
-        if(Inv.slot1_mag_ammo == 0 && inreload == false && Inv.mid_ammo > 0 && Bot.GetComponent<Bot_Inventory>().M4_Selected == true && isshooting == false){
+        if(Inv.slot1_mag_ammo == 0 && inreload == false && Inv.mid_ammo > 0 && Inv.M4_Selected == true && isshooting == false){
             inreload = true;
             Inv.mid_ammo -= 25;
             if(Inv.mid_ammo < 0){
@@ -123,17 +119,17 @@ public class Bot_Shoot : MonoBehaviour
         }
 
         //Für Automatische Gewähre. (Ak47)
-        if(Bot.GetComponent<Bot_Inventory>().Ak47_Selected == true && isshooting == false && Inv.slot1_mag_ammo > 0){
+        if(Inv.Ak47_Selected == true && isshooting == false && Inv.slot1_mag_ammo > 0){
             isshooting = true;
             for( ; Inv.slot1_mag_ammo != 0 ; Inv.slot1_mag_ammo--){
                 //Raycast schuss
                 RaycastHit2D hitinfo = Physics2D.Raycast(Feuerpunkt.transform.position, Feuerpunkt.transform.up, 50f); //Glock schießt 50f weit
                 if(hitinfo){
                     if(hitinfo.collider.gameObject.tag == "Player"){
-                        hitinfo.collider.gameObject.GetComponent<Player_Health>().health -= 25; //Player nimmt 15 Schaden
-                    }else if(hitinfo.collider.gameObject.tag == "Bot"){
-                        hitinfo.collider.gameObject.GetComponent<Bot_Health>().health -= 25; //Bot nimmt 15 Schaden
-                    }
+                    hitinfo.collider.GetComponent<Player_Health>().Damage(35);
+                }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                    hitinfo.collider.GetComponent<Bot_Health>().Damage(35);
+                }
                 
                     //Einschuss Animation (Blut)
                     if(hitinfo.collider.gameObject.tag == "Player" || hitinfo.collider.gameObject.tag == "Bot"){
@@ -154,7 +150,7 @@ public class Bot_Shoot : MonoBehaviour
             isshooting = false;
         }
         //Reload Ak47
-        if(Inv.slot1_mag_ammo == 0 && inreload == false && Inv.mid_ammo > 0 && Bot.GetComponent<Bot_Inventory>().Ak47_Selected == true && isshooting == false){
+        if(Inv.slot1_mag_ammo == 0 && inreload == false && Inv.mid_ammo > 0 && Inv.Ak47_Selected == true && isshooting == false){
             inreload = true;
             Inv.mid_ammo -= 25;
             if(Inv.mid_ammo < 0){
@@ -171,15 +167,15 @@ public class Bot_Shoot : MonoBehaviour
         }
 
         //Sniper
-        if(Bot.GetComponent<Bot_Inventory>().Sniper_Selected == true && isshooting == false && Inv.slot1_mag_ammo > 0){
+        if(Inv.Sniper_Selected == true && isshooting == false && Inv.slot1_mag_ammo > 0){
             isshooting = true;
             //Raycast schuss
             RaycastHit2D hitinfo = Physics2D.Raycast(Feuerpunkt.transform.position, Feuerpunkt.transform.up, 150f); //Glock schießt 50f weit
             if(hitinfo){
                 if(hitinfo.collider.gameObject.tag == "Player"){
-                    hitinfo.collider.gameObject.GetComponent<Player_Health>().health -= 150; //Player nimmt 150 Schaden
+                    hitinfo.collider.GetComponent<Player_Health>().Damage(150);
                 }else if(hitinfo.collider.gameObject.tag == "Bot"){
-                    hitinfo.collider.gameObject.GetComponent<Bot_Health>().health -= 150; //Bot nimmt 150 Schaden
+                    hitinfo.collider.GetComponent<Bot_Health>().Damage(150);
                 }
                 
                 //Einschuss Animation (Blut)
@@ -202,7 +198,7 @@ public class Bot_Shoot : MonoBehaviour
         }
 
         //Reload Sniper
-        if(Inv.slot1_mag_ammo == 0 && inreload == false && Inv.big_ammo > 0 && Bot.GetComponent<Bot_Inventory>().Sniper_Selected == true && isshooting == false){
+        if(Inv.slot1_mag_ammo == 0 && inreload == false && Inv.big_ammo > 0 && Inv.Sniper_Selected == true && isshooting == false){
             inreload = true;
             Inv.big_ammo -= 5;
             if(Inv.big_ammo < 0){

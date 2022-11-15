@@ -59,8 +59,16 @@ public class Inventory_Handler : MonoBehaviour
     [SerializeField] public GameObject Glock_18_Item, M4_Item, AK_47_Item, Sniper_Item, Slot1_GameObject, Slot2_GameObject, Slot3_GameObject;
     [SerializeField] private Sprite Placeholder;
     private Animator animator;
+    public int Kills;
+    private Text Small_Ammo_Reserve, Mid_Ammo_Reserve, Big_Ammo_Reserve, Ammo_Reserve, Ammo_Mag;
 
-    // Start is called before the first frame update
+    void Awake(){
+        Small_Ammo_Reserve = GameObject.Find("Small Ammo Reserve").GetComponent<Text>();
+        Mid_Ammo_Reserve = GameObject.Find("Mid Ammo Reserve").GetComponent<Text>();
+        Big_Ammo_Reserve = GameObject.Find("Big Ammo Reserve").GetComponent<Text>();
+        Ammo_Reserve = GameObject.Find("Ammo_Reserve").GetComponent<Text>();
+        Ammo_Mag =GameObject.Find("Ammo_Mag").GetComponent<Text>();
+    }
     void Start()
     {
         Healtxt = GameObject.Find("Heal_Count").GetComponent<Text>();
@@ -86,14 +94,16 @@ public class Inventory_Handler : MonoBehaviour
         if(Player_Heal == 6) Player_Heal -= 1;
         if(Player_Heal2 == 6) Player_Heal -= 1;
 
-        //Munition im UI anzeigen
-        GameObject.Find("Small Ammo Reserve").GetComponent<Text>().text = small_ammo.ToString();
-        GameObject.Find("Mid Ammo Reserve").GetComponent<Text>().text = mid_ammo.ToString();
-        GameObject.Find("Big Ammo Reserve").GetComponent<Text>().text = big_ammo.ToString(); 
+        try{
+            //Munition im UI anzeigen
+            Small_Ammo_Reserve.text = small_ammo.ToString();
+            Mid_Ammo_Reserve.text = mid_ammo.ToString();
+            Big_Ammo_Reserve.text = big_ammo.ToString(); 
 
-        //MagUI Funktion darstellen.
-        GameObject.Find("Ammo_Reserve").GetComponent<Text>().text = CurrentMaxAmmo.ToString();
-        GameObject.Find("Ammo_Mag").GetComponent<Text>().text = CurrentMag.ToString();
+            //MagUI Funktion darstellen.
+            Ammo_Reserve.text = CurrentMaxAmmo.ToString();
+            Ammo_Mag.text = CurrentMag.ToString();
+        }catch{}
 
         //Mag wird aufs Aktuelle gewechselt. Mann Könnte bei den Conditionen bei Problemen andere Waffen auf False setzen.
         if(Glock_18_Selected == true){
@@ -134,7 +144,7 @@ public class Inventory_Handler : MonoBehaviour
             counter++;
             DisplayAverage = Average / counter;
             FPS_Counter.text = "FPS:" + current.ToString() + "\n" + "Average:" + DisplayAverage.ToString();
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(.1f);
         }
         //Mit Minimap:
         //PC Average: 36FPS
@@ -220,14 +230,14 @@ public class Inventory_Handler : MonoBehaviour
         dropoffsetx = 0; //reset damit beim nächsten durchlauf die if statements nicht übersprungen werden
         dropoffsety = 0;
             do{
-                dropoffsetx = Random.Range(-2.2f, 2.2f);
-            }while((dropoffsetx < 2.5 && dropoffsetx > 2.2 || dropoffsetx < -2.2 && dropoffsetx > -2.2));
+                dropoffsetx = Random.Range(-4.2f, 4.2f);
+            }while((dropoffsetx < 4.5 && dropoffsetx > 4.2 || dropoffsetx < -4.2 && dropoffsetx > -4.2));
             do{
-                dropoffsety = Random.Range(-2.2f, 2.2f);
-            }while((dropoffsety < 2.5 && dropoffsety > 2.2 || dropoffsety < -2.2 && dropoffsety > -2.2));
+                dropoffsety = Random.Range(-3.2f, 3.2f);
+            }while((dropoffsety < 3.5 && dropoffsety > 3.2 || dropoffsety < -3.2 && dropoffsety > -3.2));
             if(lastslot == "Slot1"){
                 //Get all Information from dropped weapon and give the Ammo back to the Player
-                //Droppe die Waffe in nem Random ort in einem kleinem Radius von 2f bis -2f
+                //Droppe die Waffe in nem Random ort in einem kleinem Radius.
                 if(Slot1_Item == "Glock_18"){
                     small_ammo += slot1_mag_ammo;
                     Instantiate(Glock_18_Item, new Vector3(Player.transform.position.x + dropoffsetx, Player.transform.position.y + dropoffsety, 120f), Quaternion.identity);
@@ -314,18 +324,21 @@ public class Inventory_Handler : MonoBehaviour
     public void DeleteSlot(int slotnum){
         if(slotnum == 1){
             Slot1_GameObject = null; //Clear Slot 1
+            Slot1_Item = null;
             Slot1 = false;
             lootcount2 -= 1;
             slot1_mag_ammo = 0;
             GameObject.Find("Icon1").GetComponent<Image>().sprite = Placeholder; 
         }else if(slotnum == 2){
             Slot2_GameObject = null; //Clear Slot 2
+            Slot2_Item = null;
             Slot2 = false;
             lootcount2 -= 1;
             slot2_mag_ammo = 0;
             GameObject.Find("Icon2").GetComponent<Image>().sprite = Placeholder; 
         }else if(slotnum == 3){
             Slot3_GameObject = null; //Clear Slot 3
+            Slot3_Item = null;
             Slot3 = false;
             lootcount2 -= 1;
             slot3_mag_ammo = 0;

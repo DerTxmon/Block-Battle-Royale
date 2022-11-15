@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
+using UnityEngine.Rendering.Universal;
 
 public class Movement : MonoBehaviour
 {
-
     public float speed;
     Rigidbody2D rb;
     public FixedJoystick joystick1;
@@ -33,14 +33,25 @@ public class Movement : MonoBehaviour
     public bool lootbutton;
     public string Player_Name_Ingame;
     public GameObject Name_Text;
+    public GameObject PostProcessingVolume, Wald;
 
     void Awake(){
-        
+        //Performance Settings from Menu
+        if(Menu_Handler.performancemode == false){
+            //-Low Performance settings-
+            //Disable Post Processing
+            PostProcessingVolume.SetActive(false);
+        }else{
+            PostProcessingVolume.SetActive(true);
+        }
+        //Setz den Player auf die im Dropoff Screen angegebene Position
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        if(Dropoff_Handler.DropoffX != 0 || Dropoff_Handler.DropoffY != 0) Player.transform.position = new Vector3(Dropoff_Handler.DropoffX, Dropoff_Handler.DropoffY, 100f);//if statement nur für in editor bequemlichkeit
+        Debug.Log(Dropoff_Handler.DropoffX);
         Player_Name_Ingame = Menu_Handler.Player_Name;
         Name_Text.GetComponent<TextMeshPro>().text = Player_Name_Ingame;
         World = GameObject.Find("World");
@@ -62,9 +73,9 @@ public class Movement : MonoBehaviour
         float X = joystick1.Horizontal;
         float Y = joystick1.Vertical;
 
-        Vector2 movementDir = new Vector2(X,Y);
+        Vector2 movementDir = new Vector2(X  * speed * Time.fixedDeltaTime, Y  * speed * Time.fixedDeltaTime);
 
-        transform.Translate(movementDir * speed * Time.fixedDeltaTime, Space.World);
+        transform.Translate(movementDir, Space.World);
 
         
         if(transform.position != lastpos){
@@ -99,13 +110,13 @@ public class Movement : MonoBehaviour
         begin:
         for( ;steping; ){
             Instantiate(Footsteps,new Vector3(transform.position.x, transform.position.y, 121f), transform.rotation);
-            yield return new WaitForSeconds(.3f);
+            yield return new WaitForSeconds(.2f);
             if(!steping) break;
             Instantiate(Footsteps2, new Vector3(transform.position.x, transform.position.y, 121f), transform.rotation);
-            yield return new WaitForSeconds(.3f);
+            yield return new WaitForSeconds(.2f);
         }
         if(!steping){
-            yield return new WaitForSeconds(.3f);
+            yield return new WaitForSeconds(.2f);
             goto begin;
         }
     }

@@ -49,10 +49,19 @@ public class Bot_Behavior : MonoBehaviour
     public float[] sums = new float[4];
     public float Player_Distance;
     public bool spawn_steps;
-    public GameObject Player, Bot_Name_Text;
+    public GameObject Player, Bot_Name_Text, Healthbar;
+    private Bot_Optimazation bot_optimazation;
+    private Rigidbody2D Bot_Name_Text_rb, Bot_Healthbar_rb;
+    private RectTransform Bot_Name_Text_transform;
+    private Bot_Shoot bot_shoot;
     void Awake() {
         BewegungsängerungsZeit = 15f;
         StartCoroutine(Bot_Random_Move());
+        bot_optimazation = this.gameObject.GetComponent<Bot_Optimazation>();
+        Bot_Name_Text_rb = Bot_Name_Text.GetComponent<Rigidbody2D>();
+        Bot_Name_Text_transform = Bot_Name_Text.GetComponent<RectTransform>();
+        bot_shoot = Bot.GetComponent<Bot_Shoot>();
+        Bot_Healthbar_rb = Healthbar.GetComponent<Rigidbody2D>();
     }
     void Start()
     {
@@ -68,8 +77,12 @@ public class Bot_Behavior : MonoBehaviour
     void Update()
     {
         //Name Bleibt überm Kopf
-        Bot_Name_Text.GetComponent<Rigidbody2D>().rotation = 0;
-        Bot_Name_Text.GetComponent<RectTransform>().position = new Vector2(this.gameObject.transform.position.x, this.gameObject.transform.position.y + 1.5f);
+        Bot_Name_Text_rb.rotation = 0;
+        Bot_Name_Text_transform.position = new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y + 1.5f, 0);
+
+        //Healthbar bleibt rechts
+        Bot_Healthbar_rb.rotation = 0;
+        Healthbar.transform.position = new Vector3(this.transform.position.x + .5f, this.transform.position.y ,0);
 
         //Setzt die summen in eine Array ein, damit sie später ausgewertet werden können
         /*sums[0] = rightsum;
@@ -85,7 +98,7 @@ public class Bot_Behavior : MonoBehaviour
         }
         lastpos = transform.position;
 
-        if(this.gameObject.GetComponent<Bot_Optimazation>().is_object_in_range == true){ //Nur wenn Objecte in der nähe sind.
+        if(bot_optimazation.is_object_in_range == true){ //Nur wenn Objecte in der nähe sind.
             //Schaut ob der bot gerade richtig random gerichtet ist
             StartCoroutine(CheckforY());
 
@@ -188,14 +201,14 @@ public class Bot_Behavior : MonoBehaviour
         while(steping){
             if(spawn_steps){ //Mache nur footsteps wenn der Spieler auch nah genug ist um sie in den nächsten 5-10 sekunden zu sehen
                 Instantiate(Footsteps,new Vector3(transform.position.x, transform.position.y, 113f), transform.rotation);
-                yield return new WaitForSeconds(.3f);
+                yield return new WaitForSeconds(.2f);
                 if(!steping) break;
                 Instantiate(Footsteps2, new Vector3(transform.position.x, transform.position.y,113f), transform.rotation);
             }
-            yield return new WaitForSeconds(.3f);
+            yield return new WaitForSeconds(.2f);
         }
         if(!steping){
-            yield return new WaitForSeconds(.3f);
+            yield return new WaitForSeconds(.2f);
             goto begin;
         }
     }
@@ -341,11 +354,11 @@ public class Bot_Behavior : MonoBehaviour
                 }
             }
 
-            if(EnemyContact == true && Enemy != null) movenormal = false;
+            if(EnemyContact && Enemy != null) movenormal = false;
             //Random Waffe raus hohlen und dann schießen.
             if(!runaway){ //Nur wenn er nicht wegläuft schiessen sonst schießt er ins nichts
-            Shoot = true;
-            if(schleifeny <= 1) schleifeny++;
+            StartCoroutine(bot_shoot.Shoot()); //Schießen
+            if(schleifeny <= 1 && Bot.GetComponent<Bot_Inventory>().lootcount > 0) schleifeny++;
             if(schleifeny == 1){
                 randomizerweaponmax = Bot.GetComponent<Bot_Inventory>().lootcount;
                 randomizerweapon = Random.Range(1, randomizerweaponmax);

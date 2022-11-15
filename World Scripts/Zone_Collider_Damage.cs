@@ -5,7 +5,6 @@ using UnityEngine;
 public class Zone_Collider_Damage : MonoBehaviour
 {
     public GameObject Zone;
-    public bool hi;
 
     private void OnTriggerStay2D(Collider2D collision) {
         if(collision.gameObject.tag == "Player" && Zone.GetComponent<Zone_Manager>().TakingDamage == false){

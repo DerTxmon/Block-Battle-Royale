@@ -4,25 +4,67 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
+using System.IO;
 
 public class Menu_Handler : MonoBehaviour
 {
-    public GameObject Player, Shop_Button, Play_Button, Friends_Button, Inv_Button, Coin_Counter, Player_Name_Button, Name_Input, BG1, BG2, BG3, BG4, Logo, Settings_Button, Settings_BG, Settings_Menu;
+    public GameObject Player, Shop_Button, Play_Button, Friends_Button, Inv_Button, Coin_Counter, Player_Name_Button, Name_Input, BG1, BG2, BG3, BG4, Logo, Settings_Button, Settings_BG, Settings_Menu, Settings_Menu_X;
     public GameObject LobbyMusic, Settings_X;
     public Text Coin_Count, Player_Name_Text, Bot_Counter;
     public GameObject[] BGPoints;
     public int Coins; //Muss noch Automatisch gezählt werden wird aber vorerst auf 123 Gesetzt
     public static string Player_Name = "Player";
-    public static int Menu_Bots = 0;
+    public static int Menu_Bots = 1;
     public float CAMSPEED = 0.001f;
+    public float Playerspinspeed;
+    public static bool performancemode = false;
+    public Image Black;
+    public static LocalData localdata = new LocalData(); //Sofort das Localdata object erstellen damit sofort zum launch des spiels daten gelesen/geschrieben werden können
+    public static LocalData loadeddata;
 
     void Awake(){
+        Readdata(); //Init Saved Data
+
         ChooseBG();
         StartCoroutine(PlayerSpin());
         StartCoroutine(BGMove());
         StartCoroutine(ButtonAnimation());
-        Refresh_CoinCounter();
+        //Set Saved Player name
+        Player_Name_Text.GetComponent<Text>().text = loadeddata.Saved_Player_Name;
+        //Set Saved Coins to display
+        Coin_Count.GetComponent<Text>().text = loadeddata.Saved_Coins.ToString();
+        //Setz die anzeige sofort auf 1
+        Bot_Counter.text = Menu_Bots.ToString();
     }
+
+    public static void Writedata(){
+        if(File.Exists(Application.dataPath + "/save.json")){
+            string json = JsonUtility.ToJson(localdata);
+            File.WriteAllText(Application.dataPath + "/save.json", json);
+        }else Debug.Log("Error. Couldn't find Save File");
+    }
+
+    public void Readdata(){
+        if(File.Exists(Application.dataPath + "/save.json")){
+            string json = File.ReadAllText(Application.dataPath + "/save.json");
+            loadeddata = JsonUtility.FromJson<LocalData>(json);
+        }else Debug.Log("Error. Couldn't find Save File");
+    }
+    //User Saved Data Object
+    public class LocalData{
+        //Save Data
+        public string Saved_Player_Name;
+        public int Saved_Coins;
+        public int Wins;
+        public int Kills;
+        public int PlayerID; //Web Server teilt einmalig zu und wird ab dann nur noch gelesen.
+    }
+
+    public static void Initlocaldata(){
+        localdata.Kills = loadeddata.Kills;
+        //mit allen variablen...
+    }
+
     public void ChooseBG(){
         int BGnum = UnityEngine.Random.Range(0,4);
         if(BGnum == 0){
@@ -91,9 +133,13 @@ public class Menu_Handler : MonoBehaviour
 
     public IEnumerator PlayerSpin(){
         while(true){
-            Player.GetComponent<Rigidbody2D>().rotation -= .1f;
+            Player.GetComponent<Rigidbody2D>().rotation += Playerspinspeed * Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
+    }
+
+    public void performanceswitch(bool mode){
+        performancemode = mode;
     }
 
     public IEnumerator BGMove(){
@@ -101,7 +147,7 @@ public class Menu_Handler : MonoBehaviour
             int rand = UnityEngine.Random.Range(0,4); //Suche einen der 4 Punkte zum Moven aus
             Vector2 nextcampos = BGPoints[rand].transform.position;
             while(new Vector2(transform.position.x, transform.position.y) != new Vector2(BGPoints[rand].transform.position.x, BGPoints[rand].transform.position.y)){
-                transform.position = Vector2.MoveTowards(transform.position, BGPoints[rand].transform.position, CAMSPEED);
+                transform.position = Vector2.MoveTowards(transform.position, BGPoints[rand].transform.position, CAMSPEED * Time.deltaTime);
                 yield return new WaitForEndOfFrame();
             }
             yield return new WaitForEndOfFrame();
@@ -137,22 +183,28 @@ public class Menu_Handler : MonoBehaviour
 
         Name_Input.SetActive(false); //Input Field
 
-        Player_Name = Nick;
+        if(Nick == null){
+            Player_Name = "Player";
+        }else Player_Name = Nick;
         
         Refresh_PlayerName();
     }
 
     public void Refresh_CoinCounter(){
-        Coin_Count.GetComponent<Text>().text = Coins.ToString();
+        Coin_Count.GetComponent<Text>().text = localdata.Saved_Coins.ToString();
+        Writedata();
     }
 
     public void Refresh_PlayerName(){
         Player_Name_Text.GetComponent<Text>().text = Player_Name;
+        //Write to save variable
+        localdata.Saved_Player_Name = Player_Name;
+        Writedata();
     }
 
     public void StartGame(){
         //Load the Game
-        SceneManager.LoadScene(sceneName:"Game");
+        SceneManager.LoadScene(sceneName:"Dropoff");
     }
 
     public void AddBot(){
@@ -161,7 +213,7 @@ public class Menu_Handler : MonoBehaviour
     }
 
     public void RemoveBot(){
-        if(Menu_Bots != 0) Menu_Bots -= 1;
+        if(Menu_Bots > 1) Menu_Bots -= 1;
         Bot_Counter.text = Menu_Bots.ToString();
     }
     public void Settings(){
@@ -177,6 +229,7 @@ public class Menu_Handler : MonoBehaviour
         Name_Input.SetActive(false);
         Settings_Button.gameObject.SetActive(false);
 
+        Settings_Menu_X.gameObject.SetActive(true);
         Settings_Menu.gameObject.SetActive(true);
     }
 
@@ -193,6 +246,7 @@ public class Menu_Handler : MonoBehaviour
         Name_Input.SetActive(false);
         Settings_Button.gameObject.SetActive(true);
 
+        Settings_Menu_X.gameObject.SetActive(false);
         Settings_Menu.gameObject.SetActive(false);
     }
 

@@ -17,22 +17,24 @@ public class Bot_PlayerContact : MonoBehaviour
     public string[] Kistentags = new string[] {"Kiste_Oben", "Kiste_Unten", "Kiste_Rechts", "Kiste_Links"}; //Kisten
     [SerializeField] public List<int> Entryids = new List<int>();
     public bool Entry2 = false;
+    public Bot_Behavior bot_behavior;
+    public Bot_Optimazation bot_optimazation;
 
     private void Awake() {
-          
+        bot_behavior = Bot.GetComponent<Bot_Behavior>();
+        bot_optimazation = this.gameObject.GetComponentInParent<Bot_Optimazation>();
     }
     void Start(){
         norotation = Quaternion.Euler(0, 0, 0);
-        
     }
     
     void EnemyContact(float Raydistance) {
         float x = 0;
         //Setze alle sum variablen wieder auf null
-        Bot.GetComponent<Bot_Behavior>().rightsum = 0;
-        Bot.GetComponent<Bot_Behavior>().leftsum = 0;
-        Bot.GetComponent<Bot_Behavior>().topsum = 0;
-        Bot.GetComponent<Bot_Behavior>().bottomsum = 0;
+        bot_behavior.rightsum = 0;
+        bot_behavior.leftsum = 0;
+        bot_behavior.topsum = 0;
+        bot_behavior.bottomsum = 0;
 
         //Create 4 Rays. Up, Down, Left, Right.
         //1 Oben
@@ -45,8 +47,8 @@ public class Bot_PlayerContact : MonoBehaviour
             Debug.DrawLine(Bot.transform.position, contactPoints[0].point, Color.red);
         }
         if(contactPoints[0].collider == null){
-            Bot.GetComponent<Bot_Behavior>().topsum += 10;
-        }else Bot.GetComponent<Bot_Behavior>().topsum += contactPoints[0].distance;
+            bot_behavior.topsum += 10;
+        }else bot_behavior.topsum += contactPoints[0].distance;
         
         //2 Unten
         Vector2 endpos1 = Bot.transform.position + Vector3.down * Raydistance;
@@ -57,8 +59,8 @@ public class Bot_PlayerContact : MonoBehaviour
             Debug.DrawLine(Bot.transform.position, contactPoints[1].point, Color.red);
         }
         if(contactPoints[1].collider == null){
-            Bot.GetComponent<Bot_Behavior>().bottomsum += 10;
-        }else Bot.GetComponent<Bot_Behavior>().bottomsum += contactPoints[1].distance;
+            bot_behavior.bottomsum += 10;
+        }else bot_behavior.bottomsum += contactPoints[1].distance;
         
         //3 Rechts
         Vector2 endpos2 = Bot.transform.position + Vector3.right * Raydistance * 2f;
@@ -69,8 +71,8 @@ public class Bot_PlayerContact : MonoBehaviour
             Debug.DrawLine(Bot.transform.position, contactPoints[2].point, Color.red);
         }
         if(contactPoints[2].collider == null){
-            Bot.GetComponent<Bot_Behavior>().rightsum += 20;
-        }else Bot.GetComponent<Bot_Behavior>().rightsum += contactPoints[2].distance;
+            bot_behavior.rightsum += 20;
+        }else bot_behavior.rightsum += contactPoints[2].distance;
         
         //4 Links
         Vector2 endpos3 = Bot.transform.position + Vector3.left * Raydistance * 2f;
@@ -81,8 +83,8 @@ public class Bot_PlayerContact : MonoBehaviour
             Debug.DrawLine(Bot.transform.position, contactPoints[3].point, Color.red);
         }
         if(contactPoints[3].collider == null){
-            Bot.GetComponent<Bot_Behavior>().leftsum += 20;
-        }else Bot.GetComponent<Bot_Behavior>().leftsum += contactPoints[3].distance;
+            bot_behavior.leftsum += 20;
+        }else bot_behavior.leftsum += contactPoints[3].distance;
         
         //Oben Rechte ecke
         for(int i = 4; i < 20 ;i++){
@@ -95,8 +97,8 @@ public class Bot_PlayerContact : MonoBehaviour
                 Debug.DrawLine(Bot.transform.position, contactPoints[i].point, Color.red);
             }
             if(contactPoints[i].collider == null){
-            Bot.GetComponent<Bot_Behavior>().topsum += 10;
-            }else Bot.GetComponent<Bot_Behavior>().topsum += contactPoints[i].distance;
+            bot_behavior.topsum += 10;
+            }else bot_behavior.topsum += contactPoints[i].distance;
         }
         //Rechte Seite
         for(int i = 4; i < 20 ;i++){
@@ -110,8 +112,8 @@ public class Bot_PlayerContact : MonoBehaviour
             }
             //Addiere alles zur rightsum variable
             if(contactPoints[i].collider == null){
-            Bot.GetComponent<Bot_Behavior>().rightsum += 20;
-            }else Bot.GetComponent<Bot_Behavior>().rightsum += contactPoints[i].distance;
+            bot_behavior.rightsum += 20;
+            }else bot_behavior.rightsum += contactPoints[i].distance;
         }
         x = 0;
         //Oben Linke ecke
@@ -125,8 +127,8 @@ public class Bot_PlayerContact : MonoBehaviour
                 Debug.DrawLine(Bot.transform.position, contactPoints[i].point, Color.red);
             }
             if(contactPoints[i].collider == null){
-            Bot.GetComponent<Bot_Behavior>().topsum += 10;
-            }else Bot.GetComponent<Bot_Behavior>().topsum += contactPoints[i].distance;
+            bot_behavior.topsum += 10;
+            }else bot_behavior.topsum += contactPoints[i].distance;
         }
         //Linke Seite
         for(int i = 38; i < 54 ;i++){
@@ -139,8 +141,8 @@ public class Bot_PlayerContact : MonoBehaviour
                 Debug.DrawLine(Bot.transform.position, contactPoints[i].point, Color.red);
             }
             if(contactPoints[i].collider == null){
-            Bot.GetComponent<Bot_Behavior>().leftsum += 20;
-            }else Bot.GetComponent<Bot_Behavior>().leftsum += contactPoints[i].distance;
+            bot_behavior.leftsum += 20;
+            }else bot_behavior.leftsum += contactPoints[i].distance;
         }
         x = 0;
         //Unten Linke ecke
@@ -154,8 +156,8 @@ public class Bot_PlayerContact : MonoBehaviour
                 Debug.DrawLine(Bot.transform.position, contactPoints[i].point, Color.red);
             }
             if(contactPoints[i].collider == null){
-            Bot.GetComponent<Bot_Behavior>().bottomsum += 10;
-            }else Bot.GetComponent<Bot_Behavior>().bottomsum += contactPoints[i].distance;
+            bot_behavior.bottomsum += 10;
+            }else bot_behavior.bottomsum += contactPoints[i].distance;
         }
         x = 0;
         //Unten Rechte ecke
@@ -169,14 +171,14 @@ public class Bot_PlayerContact : MonoBehaviour
                 Debug.DrawLine(Bot.transform.position, contactPoints[i].point, Color.red);
             }
             if(contactPoints[i].collider == null){
-            Bot.GetComponent<Bot_Behavior>().bottomsum += 10;
-            }else Bot.GetComponent<Bot_Behavior>().bottomsum += contactPoints[i].distance;
+            bot_behavior.bottomsum += 10;
+            }else bot_behavior.bottomsum += contactPoints[i].distance;
         }
         //Setze alle Summen auf ihren Protzentsatz
-        Bot.GetComponent<Bot_Behavior>().bottomsum = Bot.GetComponent<Bot_Behavior>().bottomsum / 330;
-        Bot.GetComponent<Bot_Behavior>().topsum = Bot.GetComponent<Bot_Behavior>().topsum / 330;
-        Bot.GetComponent<Bot_Behavior>().rightsum = Bot.GetComponent<Bot_Behavior>().rightsum / 340;
-    	Bot.GetComponent<Bot_Behavior>().leftsum = Bot.GetComponent<Bot_Behavior>().leftsum / 340;
+        bot_behavior.bottomsum = bot_behavior.bottomsum / 330;
+        bot_behavior.topsum = bot_behavior.topsum / 330;
+        bot_behavior.rightsum = bot_behavior.rightsum / 340;
+    	bot_behavior.leftsum = bot_behavior.leftsum / 340;
 
         //Setzt den "Contact" bool auf true oder false je nachdem ob ein Objekt getroffen wurde.
         //Scanne jeden Ray nach Kontakt zu Items.
@@ -186,28 +188,28 @@ public class Bot_PlayerContact : MonoBehaviour
             if(contact.collider != null){
                 if(contact.collider.gameObject.tag == "Player" || contact.collider.gameObject.tag == "Bot"){
                     //Setzt das Collidierte Gameobject zum Aktuellen Gegner.
-                    if(Bot.GetComponent<Bot_Behavior>().EnemyContact == false) Bot.GetComponent<Bot_Behavior>().Enemy = contact.collider.gameObject;
-                    Bot.GetComponent<Bot_Behavior>().EnemyContact = true;
+                    if(bot_behavior.EnemyContact == false) bot_behavior.Enemy = contact.collider.gameObject;
+                    bot_behavior.EnemyContact = true;
                     break; //Um die Varialble beim nächsten durchlauf nicht wieder auf false zu setzen.
                 }
 
                 //Loot Registrieren
                 //Waffen
-                if(Bot.GetComponent<Bot_Behavior>().EnemyContact == false){
+                if(bot_behavior.EnemyContact == false){
                 foreach(string i in Itemtags){
-                    if(contact.collider.gameObject.tag == i && Bot.GetComponent<Bot_Behavior>().Currloot == null){
-                        if(Bot.GetComponent<Bot_Behavior>().Currloot == null && Bot.GetComponent<Bot_Inventory>().lootcount < 3){
-                            Bot.GetComponent<Bot_Behavior>().Currloot = contact.collider.gameObject;
-                            Bot.GetComponent<Bot_Behavior>().looting = true;
+                    if(contact.collider.gameObject.tag == i && bot_behavior.Currloot == null){
+                        if(bot_behavior.Currloot == null && Bot.GetComponent<Bot_Inventory>().lootcount < 3){
+                            bot_behavior.Currloot = contact.collider.gameObject;
+                            bot_behavior.looting = true;
                         }
                         break;
                     }
                 }
                 //Ammo
                 foreach(string i in Ammotags){
-                    if(contact.collider.gameObject.tag == i && Bot.GetComponent<Bot_Behavior>().Currloot == null){
-                        Bot.GetComponent<Bot_Behavior>().Currloot = contact.collider.gameObject;
-                        Bot.GetComponent<Bot_Behavior>().looting = true;
+                    if(contact.collider.gameObject.tag == i && bot_behavior.Currloot == null){
+                        bot_behavior.Currloot = contact.collider.gameObject;
+                        bot_behavior.looting = true;
                         break;
                     }
                 }
@@ -216,26 +218,26 @@ public class Bot_PlayerContact : MonoBehaviour
                     if(contact.collider.gameObject.tag == i){
                         try{
                         if(contact.collider.gameObject.GetComponent<Kiste>().isopen == false){
-                            Bot.GetComponent<Bot_Behavior>().Currloot = contact.collider.gameObject;
-                            Bot.GetComponent<Bot_Behavior>().looting = true;
+                            bot_behavior.Currloot = contact.collider.gameObject;
+                            bot_behavior.looting = true;
                             break;
                         }else{
-                            Bot.GetComponent<Bot_Behavior>().Currloot = null;
-                            Bot.GetComponent<Bot_Behavior>().looting = false;
+                            bot_behavior.Currloot = null;
+                            bot_behavior.looting = false;
                         }
                         }catch{}
                     }
                 }
                 //Häuser eingänge Registrieren 
                 if(contact.collider.gameObject.tag == "Entry"){
-                    if(!Bot.GetComponent<Bot_Behavior>().EnemyContact && !Bot.GetComponent<Bot_Behavior>().looting && 
-                        Bot.GetComponent<Bot_Behavior>().Currloot == null && Bot.GetComponent<Bot_Behavior>().inhouse == false){
+                    if(!bot_behavior.EnemyContact && !bot_behavior.looting && 
+                        bot_behavior.Currloot == null && bot_behavior.inhouse == false){
                         foreach(int i in Entryids){
                             if(contact.collider.gameObject.GetComponent<Entry>().id != i && Entry2 == false){
-                                Bot.GetComponent<Bot_Behavior>().EntryPoint = contact.collider.gameObject; //Hier muss geändert werden dass wen der Bot das Haus wieder verlässt nicht diereckt wieder reingeht.
+                                bot_behavior.EntryPoint = contact.collider.gameObject; //Hier muss geändert werden dass wen der Bot das Haus wieder verlässt nicht diereckt wieder reingeht.
                             }else{
                                 if(!Entry2){
-                                    Bot.GetComponent<Bot_Behavior>().EntryPoint = null;
+                                    bot_behavior.EntryPoint = null;
                                 }
                             }
                         }
@@ -243,10 +245,10 @@ public class Bot_PlayerContact : MonoBehaviour
                 }
             }else{
                 //Setzt auf null.
-                Bot.GetComponent<Bot_Behavior>().Enemy = null;
-                Bot.GetComponent<Bot_Behavior>().EnemyContact = false;
-                Bot.GetComponent<Bot_Behavior>().looting = false;
-                Bot.GetComponent<Bot_Behavior>().Currloot = null;
+                bot_behavior.Enemy = null;
+                bot_behavior.EnemyContact = false;
+                bot_behavior.looting = false;
+                bot_behavior.Currloot = null;
             }
             }
         }
@@ -255,6 +257,6 @@ public class Bot_PlayerContact : MonoBehaviour
     void Update(){
         //Damit sich die Hitbox für den Enemy detect nicht dumm bewegt.
         transform.rotation = Quaternion.Euler(0f,0f,Bot.transform.rotation.z - transform.rotation.z);
-        EnemyContact(Raydistance);
+        if(bot_optimazation.is_object_in_range) EnemyContact(Raydistance);
     }
 }

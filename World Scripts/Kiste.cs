@@ -42,7 +42,6 @@ public class Kiste : MonoBehaviour
 
     public IEnumerator Open(){ // Diese Funktion wird vom Kisten Check aufgerufen
         isopen = true;
-        Debug.Log("Open");
         if(gameObject.name == "Kiste_Unten(Clone)" || gameObject.name == "Kiste_Rechts Variant(Clone)"){
             //-------
             //Für Kiste Unten und Kiste Rechts
@@ -58,7 +57,7 @@ public class Kiste : MonoBehaviour
                     Instantiate(Sniper,  new Vector3(Kisteobj.transform.position.x + Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y - Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
                 }else if(weaponnum > 60 && weaponnum <= 100){ //40% auf Glock
                     Instantiate(Glock, new Vector3(Kisteobj.transform.position.x + Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y - Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
-                }else Debug.Log("Kiste hat keine Waffe ausgegeben" + weaponnum);
+                }
                 yield return new WaitForSeconds(0.01f);
             }
             //2 Munitionsstapel Spawnen
@@ -87,7 +86,7 @@ public class Kiste : MonoBehaviour
                     Instantiate(Sniper,  new Vector3(Kisteobj.transform.position.x - Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y + Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
                 }else if(weaponnum > 60 && weaponnum <= 100){ //40% auf Glock
                     Instantiate(Glock, new Vector3(Kisteobj.transform.position.x - Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y + Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
-                }else Debug.Log("Kiste hat keine Waffe ausgegeben" + weaponnum);
+                }
                 yield return new WaitForSeconds(0.01f);
             }
             //2 Munitionsstapel Spawnen

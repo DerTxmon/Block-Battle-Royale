@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Player_Health : MonoBehaviour
 {
@@ -10,7 +11,11 @@ public class Player_Health : MonoBehaviour
     public Text Lebenstext;
     private GameObject World;
     public GameObject Healthbar;
-    // Start is called before the first frame update
+    public UI_Handler UI;
+    
+    void Awake(){
+        UI = gameObject.GetComponent<UI_Handler>();
+    }
     void Start()
     {
         health = 200f;
@@ -18,10 +23,16 @@ public class Player_Health : MonoBehaviour
         Maxhealth = 200f;
         World = GameObject.Find("World");
     }
-
-    // Update is called once per frame
-    void Update()
-    {
+    
+    public void Damage(int Dmg){
+        health -= Dmg;
+        //Check for death
+        if(health <= 0){
+            StartCoroutine(Death());
+        }
+        //Korrigiere - Zahlen
+        if(health < 0 ) health = 0;
+        //UI Update
         Lebenstext.text = health.ToString() + "%";
         Healthbar.GetComponent<Image>().fillAmount = health / Maxhealth;
         if(health <= 20){
@@ -29,11 +40,15 @@ public class Player_Health : MonoBehaviour
         }else{
             Healthbar.GetComponent<Image>().color = Color.green;
         }
+    }
 
-        //Spieler stirbt wenn er 0HP hat
-        if(health <= 0){
-            Destroy(this.gameObject);
-            Time.timeScale = 0;
+    public IEnumerator Death(){
+        //Langsam Zeit runter schrauben
+        while(Time.timeScale != .1f){
+            yield return new WaitForSeconds(.2f);
+            float applytotime = Time.timeScale -.1f;
+            Time.timeScale = (float)System.Math.Round(applytotime * 100) / 100;
         }
+        StartCoroutine(UI.EndScreen());
     }
 }
