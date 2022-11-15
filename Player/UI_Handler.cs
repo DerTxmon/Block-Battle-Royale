@@ -24,7 +24,10 @@ public class UI_Handler : MonoBehaviour
     public List<SpriteRenderer> HudComponents_Sprites;
     public List<Text> HudComponents_Text;
     private float x;
+    public GameObject[] MapTexte;
+    public GameObject World;
     void Awake() {
+        World = GameObject.Find("World");
         foreach(GameObject i in HUD){
             if(i.GetComponent<SpriteRenderer>() != null){
                 HudComponents_Sprites.Add(i.gameObject.GetComponent<SpriteRenderer>()); //Nimmt jedes GameObject aus dem Hud und trägt den Color component in eine liste ein um beim tod das hud langsam aus zublenden
@@ -85,12 +88,12 @@ public class UI_Handler : MonoBehaviour
     
     private void Calcstats(){
         Kills.text = Inv.Kills.ToString(); //Kills
-        Place.text = "#" +  Map_Manager.Playercount.ToString(); //Placement
-        SurvivedTime.text = Map_Manager.SurvivedTime.ToString(); //Survived time
+        Place.text = "#" +  World.GetComponent<Map_Manager>().Playercount.ToString(); //Placement
+        SurvivedTime.text = World.GetComponent<Map_Manager>().SurvivedTime.ToString(); //Survived time
         Damage.text = Shoot.Damage_dealt.ToString();
         //calc coins to get and then apply to text component
         givecoins = Inv.Kills;
-        if(Map_Manager.Playercount == 1){ //Wenn Gewonnen + 10 Extra Coins
+        if(World.GetComponent<Map_Manager>().Playercount == 1){ //Wenn Gewonnen + 10 Extra Coins
             givecoins += 10;
         }
         //Zähl die coins später in einer animation hoch
@@ -112,16 +115,24 @@ public class UI_Handler : MonoBehaviour
         }
     }
     public IEnumerator EndScreen(){
+        //Spieler Scripts deaktivieren so das er nichts mehr machen kann wie rum laufen oder schießen
+        this.gameObject.GetComponent<Movement>().enabled = false;
+        this.gameObject.GetComponent<Shoot>().enabled = false;
+        //Zieh die infos die die stats brauchen aus den jeweiligen scripts
         Calcstats();
         StatWindow.SetActive(true);
         MinimapCam.SetActive(true);
+        //Schalte alle Texte auf der Map aus
+        foreach(GameObject i in MapTexte){
+            i.gameObject.SetActive(false);
+        }
         //Blend Langsam das Fenster ein
         Time.timeScale = 1;
         for(int runs = 0; runs != 255; runs++){
             StatWindow.GetComponent<Image>().color = new Color(StatWindow.GetComponent<Image>().color.r, StatWindow.GetComponent<Image>().color.g, StatWindow.GetComponent<Image>().color.b, StatWindow.GetComponent<Image>().color.a + 0.003921568627451f); //0.003921568627451f stellt 1 dar. da alpha von 0 bis 255 geht und alpha aber im code zwischen 0-1 bestimmt werden muss also 255/1 = 0.003921568627451f
             Kills.gameObject.GetComponent<Text>().color = new Color(0f, 0f, 0f, Kills.gameObject.GetComponent<Text>().color.a + 0.003921568627451f);
-            if(Place.text != "1") Place.gameObject.GetComponent<Text>().color = new Color(0f, 0f, 0f, Place.gameObject.GetComponent<Text>().color.a + 0.003921568627451f);
-            else Place.gameObject.GetComponent<Text>().color = new Color(255f, 255f, 0f, Place.gameObject.GetComponent<Text>().color.a + 0.003921568627451f); //wenn erster platz mache test gelb
+            if(Place.text == "1") Place.gameObject.GetComponent<Text>().color = new Color(255f, 255f, 0f, Place.gameObject.GetComponent<Text>().color.a + 0.003921568627451f);
+            else Place.gameObject.GetComponent<Text>().color = new Color(0f, 0f, 0f, Place.gameObject.GetComponent<Text>().color.a + 0.003921568627451f); //wenn erster platz mache text gelb
             Damage.gameObject.GetComponent<Text>().color = new Color(0f, 0f, 0f, Damage.gameObject.GetComponent<Text>().color.a + 0.003921568627451f);
             SurvivedTime.gameObject.GetComponent<Text>().color = new Color(0f, 0f, 0f, SurvivedTime.gameObject.GetComponent<Text>().color.a + 0.003921568627451f); //0f bei r g und b für den code schwarz
             CoinsEarned.gameObject.GetComponent<Text>().color = new Color (0f, 255f, 255f, CoinsEarned.GetComponent<Text>().color.a + 0.003921568627451f);
@@ -154,7 +165,6 @@ public class UI_Handler : MonoBehaviour
 
             yield return new WaitForSeconds(.0013f);
         }
-        //Time.timeScale = 0;
         //Deactivate HUD
         foreach(GameObject i in HUD){
             i.gameObject.SetActive(false); //Alles was noch nicht deaktiviert wird jetzt deaktivieren.
@@ -164,8 +174,7 @@ public class UI_Handler : MonoBehaviour
             CoinsEarned.text = y.ToString();
             yield return new WaitForEndOfFrame();
         }
-        //
-        StartCoroutine(Zoominout());
+        //StartCoroutine(Zoominout());
         //Save Stats to save.json
         Menu_Handler.localdata.Kills = Menu_Handler.loadeddata.Kills + givecoins; //Kills 
         Menu_Handler.localdata.Saved_Coins = Menu_Handler.loadeddata.Saved_Coins + givecoins; //Coins (Schon gespeicherte coins + neu verdient)

@@ -5,8 +5,8 @@ using UnityEngine.UI;
 using UnityEngine.Experimental.Rendering.Universal;
 public class Map_Manager : MonoBehaviour
 {
-    public static int Playercount;
-    public static float SurvivedTime;
+    public int Playercount;
+    public float SurvivedTime;
     private GameObject[] x;
     private int y = 1;
     public GameObject[] EntryPoints;
@@ -27,7 +27,9 @@ public class Map_Manager : MonoBehaviour
 
     void Awake(){
         //Zeig schonmal die eingestellen Bots an damit das script im hintergrund schonmal zählen kann
-        GameObject.Find("PlayerCount").GetComponent<Text>().text = Menu_Handler.Menu_Bots.ToString();
+        try{
+            GameObject.Find("PlayerCount").GetComponent<Text>().text = Menu_Handler.Menu_Bots.ToString(); //try wegen Map manager wird schon im Dropoff geladen
+        }catch{}
         //Registriere alle Laternen in eine Array
         Laternen = GameObject.FindGameObjectsWithTag("Laternen");
         //Mache alle Lichter aus
@@ -54,7 +56,7 @@ public class Map_Manager : MonoBehaviour
     private IEnumerator Counting(){
         while(true){
             yield return new WaitForSeconds(1f);
-            SurvivedTime += 1;
+            if(Time.timeScale == 1) SurvivedTime += 1; //Zeit zählen wenn nicht im Map menü oder im endscreen 
         }
     }
 
@@ -90,10 +92,11 @@ public class Map_Manager : MonoBehaviour
     }
 
     IEnumerator PlayerCheck(){
+        yield return new WaitForSeconds(.2f); //Warte bis die ersten bots spawnen damit das spiel nicht denkt das man sofort gewonnen hat
         while(true){
         try{
-            x = GameObject.FindGameObjectsWithTag("Bot");
-            Playercount = x.Length;
+            x = GameObject.FindGameObjectsWithTag("Bot"); //Kostet leistung ist aber schnelli zu schreiben mann könnte aber alle gespawnen spieler beim spawnen in eine liste
+            Playercount = x.Length; //packen und dann hier in einer schleife checken ob dieser slot in der array null ist oder nicht und daran dann checken wie viele spieler noch leben
             x = GameObject.FindGameObjectsWithTag("Player");
             Playercount += x.Length;
             GameObject.Find("PlayerCount").GetComponent<Text>().text = Playercount.ToString();
@@ -101,6 +104,7 @@ public class Map_Manager : MonoBehaviour
 
         if(Playercount == 1){
             Win();
+            break;
         }
         if(Playercount <= 5){ //Wenn nur noch 5 Spieler leben check alle .5sec nach playercount
             minus = -1.5f;
@@ -110,7 +114,7 @@ public class Map_Manager : MonoBehaviour
     }
 
     public void  Win(){
-        Player.GetComponent<UI_Handler>().EndScreen();
+        StartCoroutine(Player.GetComponent<UI_Handler>().EndScreen());
     }
 
     private void SpawnItems(){

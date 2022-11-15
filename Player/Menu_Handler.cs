@@ -14,7 +14,7 @@ public class Menu_Handler : MonoBehaviour
     public GameObject[] BGPoints;
     public int Coins; //Muss noch Automatisch gezählt werden wird aber vorerst auf 123 Gesetzt
     public static string Player_Name = "Player";
-    public static int Menu_Bots = 0;
+    public static int Menu_Bots = 1;
     public float CAMSPEED = 0.001f;
     public float Playerspinspeed;
     public static bool performancemode = false;
@@ -33,6 +33,8 @@ public class Menu_Handler : MonoBehaviour
         Player_Name_Text.GetComponent<Text>().text = loadeddata.Saved_Player_Name;
         //Set Saved Coins to display
         Coin_Count.GetComponent<Text>().text = loadeddata.Saved_Coins.ToString();
+        //Setz die anzeige sofort auf 1
+        Bot_Counter.text = Menu_Bots.ToString();
     }
 
     public static void Writedata(){
@@ -211,7 +213,7 @@ public class Menu_Handler : MonoBehaviour
     }
 
     public void RemoveBot(){
-        if(Menu_Bots != 0) Menu_Bots -= 1;
+        if(Menu_Bots > 1) Menu_Bots -= 1;
         Bot_Counter.text = Menu_Bots.ToString();
     }
     public void Settings(){
