@@ -49,6 +49,6 @@ public class Player_Health : MonoBehaviour
             float applytotime = Time.timeScale -.1f;
             Time.timeScale = (float)System.Math.Round(applytotime * 100) / 100;
         }
-        StartCoroutine(UI.EndScreen());
+        StartCoroutine(UI.EndScreen(false));
     }
 }

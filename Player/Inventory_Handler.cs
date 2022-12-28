@@ -86,9 +86,9 @@ public class Inventory_Handler : MonoBehaviour
 
         //Heal Count auf Rot stellen falls Kein Heal mehr übrig ist.
         if(Player_Heal == 0){
-            Healtxt.color = Color.red;
+            Healtxt.color = new Color(255f, Healtxt.color.g, Healtxt.color.b, Healtxt.color.a); //Rot
         }else{
-            Healtxt.color = Color.black;
+            Healtxt.color = new Color(255f, 255f, 255f, Healtxt.color.a); //Schwarz
         }
 
         if(Player_Heal == 6) Player_Heal -= 1;
@@ -291,6 +291,8 @@ public class Inventory_Handler : MonoBehaviour
                 CameraZoomOut(); //Pass die Camera an
                 clickcount = 0;
                 animator.SetBool("Weaponactive", false);
+                Slot2_Item = null;
+                Slot2 = false;
             }else if(lastslot == "Slot3"){
                 //Get all Information from dropped weapon to instantiate it later with the same ammo info
                 //Droppe die Waffe in nem Random ort in einem kleinem Radius von 2f bis -2f
@@ -318,6 +320,8 @@ public class Inventory_Handler : MonoBehaviour
                 CameraZoomOut(); //Pass die Camera an
                 clickcount = 0;
                 animator.SetBool("Weaponactive", false);
+                Slot3_Item = null;
+                Slot3 = false;
                 }
             }
         }
@@ -468,8 +472,9 @@ public class Inventory_Handler : MonoBehaviour
             Ak47_Selected = false;
             Weapons.transform.Find("Glock_18_Top_Sprite").gameObject.SetActive(false);
             Glock_18_Selected = false;
-        }else if(Slot1_Item == ""){
+        }else if(Slot1_Item == null || Slot1_Item == ""){
             //Alle anderen Deaktivieren
+            Debug.Log("Hand");
             Weapons.transform.Find("Sniper_Top_Sprite").gameObject.SetActive(false);
             Sniper_Selected = false;
             Weapons.transform.Find("M4_Top_Sprite").gameObject.SetActive(false);
@@ -536,8 +541,9 @@ public class Inventory_Handler : MonoBehaviour
             Ak47_Selected = false;
             Weapons.transform.Find("Glock_18_Top_Sprite").gameObject.SetActive(false);
             Glock_18_Selected = false;
-        }else if(Slot2_Item == ""){
+        }else if(Slot2_Item == null || Slot2_Item == ""){
             //Alle anderen Deaktivieren
+            Debug.Log("Hand2");
             Weapons.transform.Find("Sniper_Top_Sprite").gameObject.SetActive(false);
             Sniper_Selected = false;
             Weapons.transform.Find("M4_Top_Sprite").gameObject.SetActive(false);
@@ -604,8 +610,8 @@ public class Inventory_Handler : MonoBehaviour
             Ak47_Selected = false;
             Weapons.transform.Find("Glock_18_Top_Sprite").gameObject.SetActive(false);
             Glock_18_Selected = false;
-        }else if(Slot3_Item == ""){
-            //Alle anderen Deaktivieren
+        }else if(Slot3_Item == null || Slot3_Item == ""){
+            Debug.Log("Hand3");
             Weapons.transform.Find("Sniper_Top_Sprite").gameObject.SetActive(false);
             Sniper_Selected = false;
             Weapons.transform.Find("M4_Top_Sprite").gameObject.SetActive(false);

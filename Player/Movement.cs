@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
-using UnityEngine.Rendering.Universal;
+using UnityEngine.U2D.Animation;
 
 public class Movement : MonoBehaviour
 {
@@ -34,17 +34,44 @@ public class Movement : MonoBehaviour
     public string Player_Name_Ingame;
     public GameObject Name_Text;
     public GameObject PostProcessingVolume, Wald;
+    public SpriteLibraryAsset DefaultSkinLibrary, AgentSkinLibrary, BetaSkinLibrary, ClownSkinLibrary, AlienSkinLibrary, OttoSkinLibrary, ChrisSkinLibrary;
 
     void Awake(){
         //Performance Settings from Menu
         if(Menu_Handler.performancemode == false){
             //-Low Performance settings-
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 30;
             //Disable Post Processing
             PostProcessingVolume.SetActive(false);
         }else{
+            //-High Performance settings-
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 999;
+
             PostProcessingVolume.SetActive(true);
         }
         //Setz den Player auf die im Dropoff Screen angegebene Position
+        //Skin Laden
+        LoadPlayerSkin();
+    }
+
+    public void LoadPlayerSkin(){
+        if(Menu_Handler.loadeddata.SelectedSkin == "Default"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = DefaultSkinLibrary;
+        }else if(Menu_Handler.loadeddata.SelectedSkin == "Beta"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = BetaSkinLibrary;
+        }else if(Menu_Handler.loadeddata.SelectedSkin == "Alien"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = AlienSkinLibrary;
+        }else if(Menu_Handler.loadeddata.SelectedSkin == "Clown"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = ClownSkinLibrary;
+        }else if(Menu_Handler.loadeddata.SelectedSkin == "Otto"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = OttoSkinLibrary;
+        }else if(Menu_Handler.loadeddata.SelectedSkin == "Chris"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = ChrisSkinLibrary;
+        }else if(Menu_Handler.loadeddata.SelectedSkin == "Agent"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = AgentSkinLibrary;
+        }
     }
 
     // Start is called before the first frame update

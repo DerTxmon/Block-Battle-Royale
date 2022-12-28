@@ -13,7 +13,6 @@ public class Plane_Fly : MonoBehaviour
 
     IEnumerator Start(){
         yield return new WaitForSeconds(FlugzeugStartTime); //Flugzeug wartet auf Start
-        Debug.Log("Flugzeug startet");
         for(int i = 0; i != 694; i++){
             this.gameObject.transform.Translate(Vector3.up * 0.0198f,Space.Self);//
             yield return new WaitForSeconds(0.007f);
