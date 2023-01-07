@@ -209,7 +209,7 @@ public class UI_Handler : MonoBehaviour
         Menu_Handler.localdata.Saved_Coins = Menu_Handler.loadeddata.Saved_Coins + givecoins; //Coins (Schon gespeicherte coins + neu verdient)
         if(win){
             Menu_Handler.localdata.Wins = Menu_Handler.loadeddata.Wins + 1;
-            GiveXP += 20;
+            GiveXP += 25;
         }
         Menu_Handler.Writedata(Menu_Handler.localdata); //Stage changes
         Menu_Handler.AddXP(GiveXP); //XP Geben

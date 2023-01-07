@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
 using UnityEngine.U2D.Animation;
+using System;
 
 public class Movement : MonoBehaviour
 {
@@ -35,10 +36,11 @@ public class Movement : MonoBehaviour
     public GameObject Name_Text;
     public GameObject PostProcessingVolume, Wald;
     public SpriteLibraryAsset DefaultSkinLibrary, AgentSkinLibrary, BetaSkinLibrary, ClownSkinLibrary, AlienSkinLibrary, OttoSkinLibrary, ChrisSkinLibrary;
+    private GameObject Joystick1handle;
 
     void Awake(){
         //Performance Settings from Menu
-        if(Menu_Handler.performancemode == false){
+        /*if(Menu_Handler.performancemode == false){
             //-Low Performance settings-
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = 30;
@@ -53,7 +55,8 @@ public class Movement : MonoBehaviour
         }
         //Setz den Player auf die im Dropoff Screen angegebene Position
         //Skin Laden
-        LoadPlayerSkin();
+        LoadPlayerSkin();*/
+        Joystick1handle = joystick1.transform.Find("Handle").gameObject;
     }
 
     public void LoadPlayerSkin(){
@@ -79,7 +82,7 @@ public class Movement : MonoBehaviour
     {
         if(Dropoff_Handler.DropoffX != 0 || Dropoff_Handler.DropoffY != 0) Player.transform.position = new Vector3(Dropoff_Handler.DropoffX, Dropoff_Handler.DropoffY, 100f);//if statement nur für in editor bequemlichkeit
         Debug.Log(Dropoff_Handler.DropoffX);
-        Player_Name_Ingame = Menu_Handler.Player_Name;
+        //Player_Name_Ingame = Menu_Handler.Player_Name;
         Name_Text.GetComponent<TextMeshPro>().text = Player_Name_Ingame;
         World = GameObject.Find("World");
         rb = GetComponent<Rigidbody2D>();
@@ -104,12 +107,16 @@ public class Movement : MonoBehaviour
 
         transform.Translate(movementDir, Space.World);
 
-        
         if(transform.position != lastpos){
             animatior.SetBool("isrunning", true);
+            //Animation speed
+            float animspeed;
+            animspeed = ((Vector2.Distance(Joystick1handle.transform.position, joystick1.transform.position)) / 2.37f) * 1.5f; //distanz vom halde vom center berechnen(max ist 2.37 um also auf eine range von 0-1 zu kommen teilen wir durch max)
+            animatior.SetFloat("runspeed", animspeed);
             steping = true;
         }else{
             animatior.SetBool("isrunning", false);
+            animatior.SetFloat("runspeed", 1f);
             steping = false;
         }
         lastpos = transform.position;

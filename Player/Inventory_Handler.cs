@@ -61,6 +61,10 @@ public class Inventory_Handler : MonoBehaviour
     private Animator animator;
     public int Kills;
     private Text Small_Ammo_Reserve, Mid_Ammo_Reserve, Big_Ammo_Reserve, Ammo_Reserve, Ammo_Mag;
+    //UI
+    public Image ShootbuttonSpriteObject;
+    public Sprite ShootbuttonSprite;
+    public Sprite HitbuttonSprite;
 
     void Awake(){
         Small_Ammo_Reserve = GameObject.Find("Small Ammo Reserve").GetComponent<Text>();
@@ -76,6 +80,7 @@ public class Inventory_Handler : MonoBehaviour
         Player_Heal = 0;
         StartCoroutine(Counting_FPS());
         animator = gameObject.GetComponent<Animator>();
+        Slot1_function(); //Ersten Slot sofort wählen
     }
 
     // Update is called once per frame
@@ -155,12 +160,14 @@ public class Inventory_Handler : MonoBehaviour
         //19 Bots on Map
         //PC Average: 40-50FPS
         //Samsung J6 Average: 10FPS
+        //Nothing Phone 1: 120FPS Stabil auch mit 20 Bots.
     }
     IEnumerator CameraZoomOut(){
         //Camera passt sich zur Waffe an
             if(Sniper_Selected){
                 //Mach die Waffe in der Hand animation an
                 Player.GetComponent<Animator>().SetBool("Weaponactive", true);
+                ShootbuttonSpriteObject.sprite = ShootbuttonSprite;
                 for(i = MainCamera.GetComponent<Camera>().orthographicSize; i <= 20f; ){
                     if(i <= 20f){
                         i++;
@@ -173,6 +180,7 @@ public class Inventory_Handler : MonoBehaviour
             }else if(M4_Selected){
                 //Mach die Waffe in der Hand animation an
                 Player.GetComponent<Animator>().SetBool("Weaponactive", true);
+                ShootbuttonSpriteObject.sprite = ShootbuttonSprite;
                 for(i = MainCamera.GetComponent<Camera>().orthographicSize; i != 12f; ){
                     if(i > 12f){
                         i--;
@@ -185,6 +193,7 @@ public class Inventory_Handler : MonoBehaviour
             }else if(Ak47_Selected){
                 //Mach die Waffe in der Hand animation an
                 Player.GetComponent<Animator>().SetBool("Weaponactive", true);
+                ShootbuttonSpriteObject.sprite = ShootbuttonSprite;
                 for(i = MainCamera.GetComponent<Camera>().orthographicSize;i != 12f; ){
                     if(i > 12f){
                         i--;
@@ -197,6 +206,7 @@ public class Inventory_Handler : MonoBehaviour
             }else if(Glock_18_Selected){
                 //Mach die Waffe in der Hand animation an
                 Player.GetComponent<Animator>().SetBool("Weaponactive", true);
+                ShootbuttonSpriteObject.sprite = ShootbuttonSprite;
                 for(i = MainCamera.GetComponent<Camera>().orthographicSize;i != 10f; ){
                 if(i > 10f){
                     i--;
@@ -209,6 +219,7 @@ public class Inventory_Handler : MonoBehaviour
             }else{ //Hand
                 //Mach die Waffe in der Hand animation an
                 Player.GetComponent<Animator>().SetBool("Weaponactive", false);
+                ShootbuttonSpriteObject.sprite = HitbuttonSprite;
                 for(i = MainCamera.GetComponent<Camera>().orthographicSize;i != 10f; ){
                 if(i > 10f){
                     i--;
@@ -474,7 +485,6 @@ public class Inventory_Handler : MonoBehaviour
             Glock_18_Selected = false;
         }else if(Slot1_Item == null || Slot1_Item == ""){
             //Alle anderen Deaktivieren
-            Debug.Log("Hand");
             Weapons.transform.Find("Sniper_Top_Sprite").gameObject.SetActive(false);
             Sniper_Selected = false;
             Weapons.transform.Find("M4_Top_Sprite").gameObject.SetActive(false);

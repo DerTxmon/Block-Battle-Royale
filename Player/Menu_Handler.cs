@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using UnityEngine.Networking;
+using UnityEngine.Advertisements;
 
 public class Menu_Handler : MonoBehaviour
 {
@@ -69,19 +69,55 @@ public class Menu_Handler : MonoBehaviour
     [SerializeField] private List<GameObject> LoadedFriends;
     [SerializeField] private GameObject FriendListButton;
     [SerializeField] private GameObject GlobalLeaderboardButton;
-    [SerializeField] private GameObject RankLeaderboardButton;
     [SerializeField] private Sprite FriendListButton_Green;
     [SerializeField] private Sprite FriendListButton_Gray;
     [SerializeField] private Sprite GlobalLeaderboardButton_Green;
     [SerializeField] private Sprite GlobalLeaderboardButton_Gray;
     [SerializeField] private Sprite RankLeaderboardButton_Green;
     [SerializeField] private Sprite RankLeaderboardButton_Gray;
+    [SerializeField] private GameObject GlobalLeaderBoardParent;
+    [SerializeField] private GameObject GlobalLeaderboardScroll;
+    [SerializeField] private Sprite Place1Sprite;
+    [SerializeField] private Sprite Place2Sprite;
+    [SerializeField] private Sprite Place3Sprite;
+    [SerializeField] private Sprite MySelfSprite;
+    [SerializeField] private Sprite FriendsButtonSprite;
+    [SerializeField] private Sprite FriendsButtonSpriteNoConnection;
+    //Shop
+    [SerializeField] private GameObject ShopSlotPrefab; //Prefab
+    [SerializeField] private Transform[] Shop_Slot;
+    [SerializeField] private Sprite Normal_ShopSlot;
+    [SerializeField] private Sprite Rare_ShopSlot;
+    [SerializeField] private Sprite Superior_ShopSlot;
+    [SerializeField] private Sprite Exquisit_ShopSlot;
+    [SerializeField] private Sprite Extravagant_ShopSlot;
+    [SerializeField] private Sprite CoinIcon;
+    [SerializeField] private Sprite EmeraldIcon;
+    [SerializeField] private GameObject ShopScroll;
+    [SerializeField] private GameObject X_Shop;
+    [SerializeField] private GameObject Skin_i;
+    [SerializeField] private GameObject SkinInfoTafel; 
+    [SerializeField] private Sprite BuyButton;
+    [SerializeField] private Sprite SoldOutButton;
+    [SerializeField] private bool infoswitch = false;
+    [SerializeField] private Sprite ShopButtonSprite;
+    [SerializeField] private Sprite ShopButtonSpriteNoConnection;
+    [SerializeField] private GameObject NoConnectionIcon;
+    //Ads
+    [SerializeField] private GameObject AdButton;
+    private static int AdCounter = 0;
+    private static int Watchedads = 0;
+
 
     void Awake(){
+        AdCounter++;
         ChooseBG();
+        DecideAdButton(); //Ad Button Erscheint nur jedes 2te mal
         StartCoroutine(PlayerSpin());
         StartCoroutine(BGMove());
         StartCoroutine(ButtonAnimation());
+        StartCoroutine(TryToHoldConnection());
+        StartCoroutine(AdAnimation());
     }
 
     void Start(){
@@ -199,7 +235,7 @@ public class Menu_Handler : MonoBehaviour
             localdata.aktuelleXP++; //1XP pro durchlauf hinzufügen
             if(localdata.aktuelleXP == localdata.TonextLevelXP){
                 localdata.Level++; //Level up
-                localdata.TonextLevelXP += (int)(localdata.TonextLevelXP / 4) + 30; //Immer 30xp mehr pro höheres level
+                localdata.TonextLevelXP += (int)(localdata.TonextLevelXP / 4) + 20; //Immer 30xp mehr pro höheres level
                 if(localdata.Level % 10 == 0){ //Jedes 10 level eine coin
                     AddEmerald(1);
                 }
@@ -210,8 +246,11 @@ public class Menu_Handler : MonoBehaviour
     public static void AddEmerald(int ammount){
         localdata.Saved_Emeralds += ammount;
         Writedata(localdata);
+        //Display
+        GameObject.Find("Emerald Counter").transform.Find("Counter").GetComponent<Text>().text = localdata.Saved_Emeralds.ToString(); //Muss so gesucht werden methode statisch ist
+        
     }
-    public void ItemAddedWindow(){
+    public static void ItemAddedWindow(int amount, string type){
 
     }
     public void ChooseBG(){
@@ -244,46 +283,64 @@ public class Menu_Handler : MonoBehaviour
     }
     public IEnumerator ButtonAnimation(){
         //Play Button Rein Raus zoom
+        //Speicher einmal alle Buttons RectTransforms (Performance)
+        RectTransform Play_ButtonRect = Play_Button.GetComponent<RectTransform>();
+        RectTransform Friends_ButtonRect = Friends_Button.GetComponent<RectTransform>();
+        RectTransform Shop_ButtonRect = Shop_Button.GetComponent<RectTransform>();
+        RectTransform Inv_ButtonRect = Inv_Button.GetComponent<RectTransform>();
         while(true){
             for(int i = 0; i != 10; i++){ //ZOOM IN
-                Play_Button.GetComponent<RectTransform>().localScale = new Vector3(Play_Button.GetComponent<RectTransform>().localScale.x +.01f,Play_Button.GetComponent<RectTransform>().localScale.y + .01f,0f);
+                Play_ButtonRect.localScale = new Vector3(Play_ButtonRect.localScale.x +.01f,Play_ButtonRect.localScale.y + .01f,0f);
                 yield return new WaitForSeconds(.03f);
             }
             for(int i = 10; i != 0; i--){ //ZOOM OUT
-                Play_Button.GetComponent<RectTransform>().localScale = new Vector3(Play_Button.GetComponent<RectTransform>().localScale.x - .01f,Play_Button.GetComponent<RectTransform>().localScale.y - .01f,0f);
+                Play_ButtonRect.localScale = new Vector3(Play_ButtonRect.localScale.x - .01f,Play_ButtonRect.localScale.y - .01f,0f);
                 yield return new WaitForSeconds(.03f);
             }
             //Friends Button
             for(int i = 0; i != 10; i++){ //ZOOM IN
-                Friends_Button.GetComponent<RectTransform>().localScale = new Vector3(Friends_Button.GetComponent<RectTransform>().localScale.x +.01f,Friends_Button.GetComponent<RectTransform>().localScale.y + .01f,0f);
+                Friends_ButtonRect.localScale = new Vector3(Friends_ButtonRect.localScale.x +.01f,Friends_ButtonRect.localScale.y + .01f,0f);
                 yield return new WaitForSeconds(.025f);
             }
             for(int i = 10; i != 0; i--){ //ZOOM OUT
-                Friends_Button.GetComponent<RectTransform>().localScale = new Vector3(Friends_Button.GetComponent<RectTransform>().localScale.x - .01f,Friends_Button.GetComponent<RectTransform>().localScale.y - .01f,0f);
+                Friends_ButtonRect.localScale = new Vector3(Friends_ButtonRect.localScale.x - .01f,Friends_ButtonRect.localScale.y - .01f,0f);
                 yield return new WaitForSeconds(.025f);
             }
             //Shop Button
             for(int i = 0; i != 10; i++){ //ZOOM IN
-                Shop_Button.GetComponent<RectTransform>().localScale = new Vector3(Shop_Button.GetComponent<RectTransform>().localScale.x +.01f,Shop_Button.GetComponent<RectTransform>().localScale.y + .01f,0f);
+                Shop_ButtonRect.localScale = new Vector3(Shop_ButtonRect.localScale.x +.01f,Shop_ButtonRect.localScale.y + .01f,0f);
                 yield return new WaitForSeconds(.025f);
             }
             for(int i = 10; i != 0; i--){ //ZOOM OUT
-                Shop_Button.GetComponent<RectTransform>().localScale = new Vector3(Shop_Button.GetComponent<RectTransform>().localScale.x - .01f,Shop_Button.GetComponent<RectTransform>().localScale.y - .01f,0f);
+                Shop_ButtonRect.localScale = new Vector3(Shop_ButtonRect.localScale.x - .01f,Shop_ButtonRect.localScale.y - .01f,0f);
                 yield return new WaitForSeconds(.025f);
             }
             //Inv Button
             for(int i = 0; i != 10; i++){ //ZOOM IN
-                Inv_Button.GetComponent<RectTransform>().localScale = new Vector3(Inv_Button.GetComponent<RectTransform>().localScale.x +.01f,Inv_Button.GetComponent<RectTransform>().localScale.y + .01f,0f);
+                Inv_ButtonRect.localScale = new Vector3(Inv_ButtonRect.localScale.x +.01f,Inv_ButtonRect.localScale.y + .01f,0f);
                 yield return new WaitForSeconds(.025f);
             }
             for(int i = 10; i != 0; i--){ //ZOOM OUT
-                Inv_Button.GetComponent<RectTransform>().localScale = new Vector3(Inv_Button.GetComponent<RectTransform>().localScale.x - .01f,Inv_Button.GetComponent<RectTransform>().localScale.y - .01f,0f);
+                Inv_ButtonRect.localScale = new Vector3(Inv_ButtonRect.localScale.x - .01f,Inv_ButtonRect.localScale.y - .01f,0f);
                 yield return new WaitForSeconds(.025f);
             }
             yield return new WaitForSeconds(3.5f);
         }
     }
-
+    public IEnumerator AdAnimation(){
+        RectTransform AdButtonRect = AdButton.GetComponent<RectTransform>();
+        while(true){
+            for(int i = 0; i != 10; i++){//Zoom den Adbutton rein
+            AdButtonRect.localScale = new Vector3(AdButtonRect.localScale.x +.01f,AdButtonRect.localScale.y + .01f,0f);
+            yield return new WaitForSeconds(.025f);
+            }
+            for(int i = 10; i != 0; i--){//Zoom den Adbutton raus
+                AdButtonRect.localScale = new Vector3(AdButtonRect.localScale.x - .01f,AdButtonRect.localScale.y - .01f,0f);
+                yield return new WaitForSeconds(.025f);
+            }
+            yield return new WaitForSeconds(1f);
+        }
+    }
     public IEnumerator PlayerSpin(){
         while(true){
             Player.GetComponent<Rigidbody2D>().rotation += Playerspinspeed * Time.deltaTime;
@@ -307,9 +364,58 @@ public class Menu_Handler : MonoBehaviour
         }
 
     }
-
+    public void DecideAdButton(){ //Checkt ob der User Eine Internet Verbindung hat und zeigt den Ad Button an oder nicht
+        if(Application.internetReachability == NetworkReachability.NotReachable){
+            AdButton.SetActive(false);
+        }else{
+            //Schaue nun ob der nutzer schon ein Ad gesehen hat
+            if(AdCounter % 2 == 0){ //Wenn der AdCounter gerade ist, dann zeige den Ad Button an
+                if(Watchedads < 2){
+                    AdButton.SetActive(true);
+                }
+            }else{
+                AdButton.SetActive(false);
+            }
+        }
+    }
+    public IEnumerator TryToHoldConnection(){
+        while(true){
+            if(Application.internetReachability == NetworkReachability.NotReachable){
+                //Mach Online Button Grau
+                Friends_Button.GetComponent<Image>().sprite = FriendsButtonSpriteNoConnection;
+                Friends_Button.GetComponent<Button>().interactable = false;
+                //Shop Button Grau
+                Shop_Button.GetComponent<Image>().sprite = ShopButtonSpriteNoConnection;
+                Shop_Button.GetComponent<Button>().interactable = false;
+                //Schalte den Ad Button aus
+                AdButton.SetActive(false);
+                //Zeige das No Connection Icon
+                NoConnectionIcon.SetActive(true);
+            }else{
+                //Mach den Online Button wieder normal
+                Friends_Button.GetComponent<Image>().sprite = FriendsButtonSprite;
+                Friends_Button.GetComponent<Button>().interactable = true;
+                //Shop Button Grau
+                Shop_Button.GetComponent<Image>().sprite = ShopButtonSprite;
+                Shop_Button.GetComponent<Button>().interactable = true;
+                //Schalte den Ad Button an
+                DecideAdButton();
+                //Zeige nicht das No Connection Icon
+                NoConnectionIcon.SetActive(false);
+            }
+            yield return new WaitForSeconds(5f);
+        }
+    }
+    public void ViewAd(){
+        Watchedads++;
+    }
     public void FriendButtonMenu(){
-        StartCoroutine(FriendsWindowCR());
+        if(Application.internetReachability != NetworkReachability.NotReachable){
+            StartCoroutine(FriendsWindowCR());
+        }else{//Mach den Button Grau
+            Friends_Button.GetComponent<Image>().sprite = FriendsButtonSpriteNoConnection;
+            Friends_Button.GetComponent<Button>().interactable = false;
+        }
     }
     public IEnumerator FriendsWindowCR(){
         //Deactivate Hud
@@ -333,16 +439,16 @@ public class Menu_Handler : MonoBehaviour
         ProgressBar.gameObject.SetActive(false);
         ProgressBarBG.gameObject.SetActive(false);
         neededXP.gameObject.SetActive(false);
+        GlobalLeaderboardScroll.SetActive(false);
+        AdButton.SetActive(false);
 
         onlineBG.SetActive(true);
         X_Friends.SetActive(true);
         FriendWindow.SetActive(true);
         FriendListButton.SetActive(true);
         GlobalLeaderboardButton.SetActive(true);
-        RankLeaderboardButton.SetActive(true);
 
         FriendListButton.GetComponent<Image>().sprite = FriendListButton_Green; //this
-        RankLeaderboardButton.GetComponent<Image>().sprite = RankLeaderboardButton_Gray;
         GlobalLeaderboardButton.GetComponent<Image>().sprite = GlobalLeaderboardButton_Gray;
 
         LoadingText.SetActive(true);
@@ -350,6 +456,7 @@ public class Menu_Handler : MonoBehaviour
         //Positionierung
         GameObject SlotToBeIn = MESlot;
         GameObject Slot = Instantiate(FriendSlot, SlotToBeIn.transform);
+        Slot.GetComponent<Image>().sprite = MySelfSprite;
         LoadedFriends.Add(Slot); //um später beim neu laden zu löschen
         Slot.transform.parent = SlotToBeIn.transform;
         Slot.GetComponent<RectTransform>().localPosition = new Vector3(0f,0f,-5000f); //setze genau auf sein Parent
@@ -366,13 +473,13 @@ public class Menu_Handler : MonoBehaviour
         Slot.transform.Find("Coins").GetComponent<Text>().text = OnlineManager.RecievedData[2];
         Slot.transform.Find("Emeralds").GetComponent<Text>().text = OnlineManager.RecievedData[3];
         //Skin
-            Image SkinSlot = Slot.transform.Find("Skin").GetComponent<Image>();
-            //Check which skin the database sends and then apply
-            foreach(Sprite model in DisplayModels){
-                if(model.name == OnlineManager.RecievedData[1]){
-                    SkinSlot.sprite = model;
-                }
+        Image SkinSlot = Slot.transform.Find("Skin").GetComponent<Image>();
+        //Check which skin the database sends and then apply
+        foreach(Sprite model in DisplayModels){
+            if(model.name == OnlineManager.RecievedData[1]){
+                SkinSlot.sprite = model;
             }
+        }
         //Start getting Friends Data...
         int x = 0;
         foreach(int i in loadeddata.FriendsIDs){
@@ -464,12 +571,51 @@ public class Menu_Handler : MonoBehaviour
         FriendsScroll.SetActive(false);
         AddFriendInput.SetActive(false);
         FriendListButton.GetComponent<Image>().sprite = FriendListButton_Gray;
-        RankLeaderboardButton.GetComponent<Image>().sprite = RankLeaderboardButton_Gray;
         GlobalLeaderboardButton.GetComponent<Image>().sprite = GlobalLeaderboardButton_Green; //this
 
         LoadingText.SetActive(true);
-        //...
-        StartCoroutine(OnlineManager.GetTop30());
+        OnlineManager.GlobalBest[0][0] = null; //Auf null setzten damit wir hier warten bis die daten in die array geladen werden und nicht ausversehen den code überspringen weil wir nicht warten
+        StartCoroutine(OnlineManager.GetTop20());
+        while(OnlineManager.GlobalBest[0][0] == null){yield return new WaitForEndOfFrame();}//warten
+        //Generate Global Top players with given data
+        GameObject Slot;
+        float nexty = 279f;
+        for(int i = 0; i != 20; i++){
+            //Debug.Log(i);
+            if(OnlineManager.GlobalBest[i][7] != loadeddata.PlayerID.ToString()){ //Check if id is identicall to mine so i can mark myself on the leaderboard
+                Slot = Instantiate(FriendSlot, GlobalLeaderBoardParent.transform); //spawn default slot
+            }else{
+                Slot = Instantiate(FriendSlot, GlobalLeaderBoardParent.transform); //Mark Slot as myself
+            }
+            //Slot Farbe
+            if(i == 0) Slot.GetComponent<Image>().sprite = Place1Sprite;
+            else if(i == 1) Slot.GetComponent<Image>().sprite = Place2Sprite;
+            else if(i == 2) Slot.GetComponent<Image>().sprite = Place3Sprite;
+            //check ob der slot man selber ist
+            if(OnlineManager.GlobalBest[i][7] == loadeddata.PlayerID.ToString()) Slot.GetComponent<Image>().sprite = MySelfSprite;
+
+            Slot.transform.parent = GlobalLeaderBoardParent.transform; //Parent to Root
+            Slot.GetComponent<RectTransform>().localPosition = new Vector3(0f, nexty, -5000f); //Positionierung
+            nexty -= 279f; //Next slot offset
+
+            //Apply Information
+            Slot.transform.Find("Level").GetComponent<Text>().text = "Level:" + OnlineManager.GlobalBest[i][6];
+            Slot.transform.Find("Wins").GetComponent<Text>().text = "Wins:" + OnlineManager.GlobalBest[i][4];
+            Slot.transform.Find("Name").GetComponent<Text>().text = OnlineManager.GlobalBest[i][0];
+            Slot.transform.Find("Coins").GetComponent<Text>().text = OnlineManager.GlobalBest[i][2];
+            Slot.transform.Find("Emeralds").GetComponent<Text>().text = OnlineManager.GlobalBest[i][3];
+
+            //Skin
+            Image SkinSlot = Slot.transform.Find("Skin").GetComponent<Image>();
+            //Check which skin the database sends and then apply
+            foreach(Sprite model in DisplayModels){
+                if(model.name == OnlineManager.GlobalBest[i][1]){
+                    SkinSlot.sprite = model;
+                }
+            }
+        }
+        LoadingText.SetActive(false);
+        GlobalLeaderboardScroll.SetActive(true);
         yield return null;
     }
     public void RankLeaderboardButtonFunc(){
@@ -479,6 +625,7 @@ public class Menu_Handler : MonoBehaviour
         Writedata(localdata);
         yield return new WaitForEndOfFrame();
         Readdata();
+        localdata = loadeddata;
     }
     public IEnumerator RefreshFriendList(){
         //Destroy all friend cards
@@ -565,6 +712,9 @@ public class Menu_Handler : MonoBehaviour
         FriendsScroll.SetActive(true);
     }
     public void ShopButton(){
+        StartCoroutine(LoadShop());
+    }
+    public IEnumerator LoadShop(){
         //Deactivate Hud
         Player.SetActive(false);
         Shop_Button.SetActive(false);
@@ -586,9 +736,207 @@ public class Menu_Handler : MonoBehaviour
         ProgressBar.gameObject.SetActive(false);
         ProgressBarBG.gameObject.SetActive(false);
         neededXP.gameObject.SetActive(false);
+        AdButton.SetActive(false);
 
         ShopBG.SetActive(true);
-        X_Inv.SetActive(true);
+        X_Shop.SetActive(true);
+        LoadingText.SetActive(true);
+        Skin_i.SetActive(true);
+        //Get Shop info from Server
+        OnlineManager.Shopinfo[0] = null;
+        StartCoroutine(OnlineManager.GetShopInfo());
+        while(OnlineManager.Shopinfo[0] == null){
+            yield return new WaitForEndOfFrame(); //Warte bis web rewuest fertig ist
+        }
+        //Bau den Shop
+        string[] LocalShopInfo = OnlineManager.Shopinfo; //array in den cache schreiben
+        int x = 0;
+        bool drawprice = true;
+        for(int i = 0; i != 5; i++){
+            GameObject Slot = Instantiate(ShopSlotPrefab, Shop_Slot[i].transform);
+            Slot.transform.parent = Shop_Slot[i];
+            Slot.GetComponent<RectTransform>().localPosition = Vector3.zero;
+            //Suche Skin und Name
+            foreach(Sprite PlayerSprite in DisplayModels){
+                if(PlayerSprite.name == LocalShopInfo[x]){
+                    //Check for Ownage
+                    Slot.transform.Find("Name").GetComponent<Text>().text = PlayerSprite.name;
+                    Slot.transform.Find("Skin").GetComponent<Image>().sprite = PlayerSprite;
+                    if(!CheckforSkinOwnage(PlayerSprite.name)){
+                        Slot.transform.Find("BuyButton").GetComponent<Image>().sprite = BuyButton;
+                        drawprice = false;
+                        //Mach den Button
+                        Slot.transform.Find("BuyButton").GetComponent<Button>().onClick.AddListener(() => {
+                            BuySkin(PlayerSprite.name);
+                        });
+                    }else{
+                        Slot.transform.Find("BuyButton").GetComponent<Image>().sprite = SoldOutButton;
+                        drawprice = true;
+                    }
+                }
+            }
+            
+            //Slot Farbe (Raritiy) + Price + Coin/Emerald
+            x++; //Um auf den Raritäts Slot zu springen
+            if(LocalShopInfo[x] == "1"){
+                Slot.GetComponent<Image>().sprite = Normal_ShopSlot; 
+                Slot.transform.Find("Price").GetComponent<Text>().text = "100";
+                Slot.transform.Find("Coin Icon").GetComponent<Image>().sprite = CoinIcon;
+            }else if(LocalShopInfo[x] == "2"){
+                Slot.GetComponent<Image>().sprite = Rare_ShopSlot;
+                Slot.transform.Find("Price").GetComponent<Text>().text = "200";
+                Slot.transform.Find("Price").transform.Find("Coin Icon").GetComponent<Image>().sprite = CoinIcon; 
+            }else if(LocalShopInfo[x] == "3"){
+                Slot.GetComponent<Image>().sprite = Superior_ShopSlot;
+                Slot.transform.Find("Price").GetComponent<Text>().text = "350";
+                Slot.transform.Find("Price").transform.Find("Coin Icon").GetComponent<Image>().sprite = CoinIcon; 
+            }else if(LocalShopInfo[x] == "4"){
+                Slot.GetComponent<Image>().sprite = Exquisit_ShopSlot;
+                Slot.transform.Find("Price").GetComponent<Text>().text = "500";
+                Slot.transform.Find("Price").transform.Find("Coin Icon").GetComponent<Image>().sprite = CoinIcon; 
+            }else if(LocalShopInfo[x] == "5"){
+                Slot.GetComponent<Image>().sprite = Extravagant_ShopSlot;
+                Slot.transform.Find("Price").GetComponent<Text>().text = "10";
+                Slot.transform.Find("Price").transform.Find("Coin Icon").GetComponent<Image>().sprite = EmeraldIcon;
+            }
+            if(drawprice){ //damit nicht über den "Sold" button gemalt wird
+                Slot.transform.Find("Price").gameObject.SetActive(false);
+                Slot.transform.Find("Price").gameObject.SetActive(false); 
+            }
+            x++;
+        }
+        LoadingText.SetActive(false);
+        ShopScroll.SetActive(true);
+    }
+    private bool CheckforSkinOwnage(string Skinname){
+        Readdata();
+        if(Skinname == "Beta" && loadeddata.Beta_Ownage) return true;
+        else if(Skinname == "Otto" && loadeddata.Otto_Ownage) return true;
+        else if(Skinname == "Alien" && loadeddata.Alien_Ownage) return true;
+        else if(Skinname == "Chris" && loadeddata.Chris_Ownage) return true;
+        else if(Skinname == "Agent" && loadeddata.Agent_Ownage) return true;
+        else if(Skinname == "Clown" && loadeddata.Clown_Ownage) return true;
+        else return false;
+    }
+    public void BuySkin(string Skinname){
+        if(Skinname == "Otto" && localdata.Saved_Coins >= 200){
+            localdata.Saved_Coins -= 200;
+            localdata.Otto_Ownage = true;
+        }else if(Skinname == "Alien" && localdata.Saved_Coins >= 500){
+            localdata.Saved_Coins -= 500;
+            localdata.Alien_Ownage = true;
+        }else if(Skinname == "Chris" && localdata.Saved_Coins >= 350){
+            localdata.Saved_Coins -= 350;
+            localdata.Chris_Ownage = true;
+        }else if(Skinname == "Agent" && localdata.Saved_Coins >= 350){
+            localdata.Saved_Coins -= 350;
+            localdata.Agent_Ownage = true;
+        }else if(Skinname == "Clown" && localdata.Saved_Coins >= 500){
+            localdata.Saved_Coins -= 500;
+            localdata.Clown_Ownage = true;
+        }else if(Skinname == "Beta"){
+            //localdata.Saved_Coins -= 200;
+            //localdata.Otto_Ownage = true;
+            //Kann man nicht kaufen
+        }
+        //... Inventar Refresh
+        StartCoroutine(RefreshShop(Skinname));
+        Refresh_CoinCounter();
+        //Update Database
+        //Weiter Funktionen am ende von Refresh shop
+    }
+    public IEnumerator RefreshShop(string Skinname){
+
+        ShopBG.SetActive(true);
+        X_Shop.SetActive(true);
+        LoadingText.SetActive(true);
+        ShopScroll.SetActive(false);
+        //Get Shop info from Server
+        OnlineManager.Shopinfo[0] = null;
+        StartCoroutine(OnlineManager.GetShopInfo());
+        while(OnlineManager.Shopinfo[0] == null){
+            yield return new WaitForEndOfFrame(); //Warte bis web rewuest fertig ist
+        }
+        //Bau den Shop
+        string[] LocalShopInfo = OnlineManager.Shopinfo; //array in den cache schreiben
+        int x = 0;
+        bool drawprice = true;
+        for(int i = 0; i != 5; i++){
+            GameObject Slot = Instantiate(ShopSlotPrefab, Shop_Slot[i].transform);
+            Slot.transform.parent = Shop_Slot[i];
+            Slot.GetComponent<RectTransform>().localPosition = Vector3.zero;
+            //Suche Skin und Name
+            foreach(Sprite PlayerSprite in DisplayModels){
+                if(PlayerSprite.name == LocalShopInfo[x]){
+                    //Check for Ownage
+                    Slot.transform.Find("Name").GetComponent<Text>().text = PlayerSprite.name;
+                    Slot.transform.Find("Skin").GetComponent<Image>().sprite = PlayerSprite;
+                    if(!CheckforSkinOwnage(PlayerSprite.name)){
+                        Slot.transform.Find("BuyButton").GetComponent<Image>().sprite = BuyButton;
+                        drawprice = false;
+                        //Mach den Button
+                        Slot.transform.Find("BuyButton").GetComponent<Button>().onClick.AddListener(() => {
+                            BuySkin(PlayerSprite.name);
+                        });
+                    }else{
+                        Slot.transform.Find("BuyButton").GetComponent<Image>().sprite = SoldOutButton;
+                        drawprice = true;
+                    }
+                }
+            }
+            
+            //Slot Farbe (Raritiy) + Price + Coin/Emerald
+            x++; //Um auf den Raritäts Slot zu springen
+            if(LocalShopInfo[x] == "1"){
+                Slot.GetComponent<Image>().sprite = Normal_ShopSlot; 
+                Slot.transform.Find("Price").GetComponent<Text>().text = "100";
+                Slot.transform.Find("Coin Icon").GetComponent<Image>().sprite = CoinIcon;
+            }else if(LocalShopInfo[x] == "2"){
+                Slot.GetComponent<Image>().sprite = Rare_ShopSlot;
+                Slot.transform.Find("Price").GetComponent<Text>().text = "200";
+                Slot.transform.Find("Price").transform.Find("Coin Icon").GetComponent<Image>().sprite = CoinIcon; 
+            }else if(LocalShopInfo[x] == "3"){
+                Slot.GetComponent<Image>().sprite = Superior_ShopSlot;
+                Slot.transform.Find("Price").GetComponent<Text>().text = "350";
+                Slot.transform.Find("Price").transform.Find("Coin Icon").GetComponent<Image>().sprite = CoinIcon; 
+            }else if(LocalShopInfo[x] == "4"){
+                Slot.GetComponent<Image>().sprite = Exquisit_ShopSlot;
+                Slot.transform.Find("Price").GetComponent<Text>().text = "500";
+                Slot.transform.Find("Price").transform.Find("Coin Icon").GetComponent<Image>().sprite = CoinIcon; 
+            }else if(LocalShopInfo[x] == "5"){
+                Slot.GetComponent<Image>().sprite = Extravagant_ShopSlot;
+                Slot.transform.Find("Price").GetComponent<Text>().text = "10";
+                Slot.transform.Find("Price").transform.Find("Coin Icon").GetComponent<Image>().sprite = EmeraldIcon;
+            }
+            if(drawprice){ //damit nicht über den "Sold" button gemalt wird
+                Slot.transform.Find("Price").gameObject.SetActive(false);
+                Slot.transform.Find("Price").gameObject.SetActive(false); 
+            }
+            x++;
+        }
+        LoadingText.SetActive(false);
+        ShopScroll.SetActive(true);
+        Skinbutton(Skinname);
+        StartCoroutine(InitUserData4());
+        //Coins werden nicht geupdated!!
+    }
+    public IEnumerator InitUserData4(){
+        Writedata(localdata);
+        yield return new WaitForEndOfFrame();
+        Readdata();
+        localdata = loadeddata;
+        StartCoroutine(OnlineManager.UpdateUserData());
+    }
+    public void SkinInformationButton(){
+        if(infoswitch){ //Info wird nicht angezeigt
+            SkinInfoTafel.SetActive(false);
+            ShopScroll.SetActive(true);
+            infoswitch = false;
+        }else{ //Info wird angezeigt
+            infoswitch = true;
+            SkinInfoTafel.SetActive(true);
+            ShopScroll.SetActive(false);
+        }
     }
 
     public void InventoryButton(){
@@ -740,6 +1088,7 @@ public class Menu_Handler : MonoBehaviour
         AddBotButton.SetActive(true);
         RemoveBotButton.SetActive(true);
         Bot_Display.SetActive(true);
+        DecideAdButton();
 
         Settings_Menu_X.gameObject.SetActive(false);
         Settings_Menu.gameObject.SetActive(false);
@@ -763,8 +1112,14 @@ public class Menu_Handler : MonoBehaviour
         FriendsScroll.SetActive(false);
         FriendListButton.SetActive(false);
         GlobalLeaderboardButton.SetActive(false);
-        RankLeaderboardButton.SetActive(false);
         AddFriendInput.SetActive(false);
+        GlobalLeaderboardScroll.SetActive(false);
+        //und Shop
+        ShopScroll.SetActive(false);
+        ShopBG.SetActive(false);
+        X_Shop.SetActive(false);
+        Skin_i.SetActive(false);
+        SkinInfoTafel.SetActive(false);
     }
 
     public void MusicSettingChanged(float newVolume){
@@ -918,5 +1273,4 @@ public class Menu_Handler : MonoBehaviour
             Menu_Skin_Display.GetComponent<Image>().sprite = AlienDisplayModel;
         } 
     }
-
 }

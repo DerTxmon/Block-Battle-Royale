@@ -22,6 +22,7 @@ $updateaftergame = $_POST["updateaftergame"];
 $updateselectedskin = $_POST["updateselectedskin"];
 $checkforexistance = $_POST["checkforexistance"];
 $gettop = $_POST["gettop"];
+$getshopinfo = $_POST["getshopinfo"];
 
 //User Data if given
 $id = $_POST["id"];
@@ -40,9 +41,17 @@ if($register == "1"){
     $result = $mysqli->query($querry);
     if(!$result) {
         printf("%s\n", $mysqli -> error);
+        echo("L");
         exit();
     }else{//Gib ID Raus
         echo $mysqli -> insert_id . "\t";
+    }
+}else if($updateuserdata == "1"){
+    $querry = "UPDATE UserData SET SelectedSkin = '$SelectedSkin', Nickname = '$Nickname', Coins = '$Coins', Emeralds = '$Emeralds', Wins = '$Wins', Kills = '$Kills', Lvl = '$Lvl' WHERE UserData.id = $id";
+    $result = $mysqli->query($querry);
+    if(!$result){
+        printf("%s\n", $mysqli -> error);
+        exit();
     }
 }else if($getuserdata == "1"){ //SELECT * FROM UserData WHERE id = 3
     $querry = "SELECT * FROM UserData WHERE id = $id";
@@ -95,7 +104,7 @@ if($register == "1"){
         }
     }
 }else if($gettop == "1"){
-    $querry = "SELECT * FROM UserData ORDER BY Wins DESC LIMIT 5";
+    $querry = "SELECT * FROM UserData ORDER BY Wins DESC, Lvl LIMIT 20";
     $result = $mysqli->query($querry);
     if(!$result){
         printf("%s\n", $mysqli -> error);
@@ -103,14 +112,36 @@ if($register == "1"){
     }else{
         $rows = $result->fetch_all(MYSQLI_ASSOC);
         foreach ($rows as $dsatz) {
-            echo $dsatz["Nickname"] . "\t"
-            . $dsatz["SelectedSkin"] . "\t" // \t um später in Unity die Daten auseinander zu nehmen
-            . $dsatz["Coins"] . "\t"
-            . $dsatz["Emeralds"] . "\t"
-            . $dsatz["Wins"] . "\t"
-            . $dsatz["Kills"] . "\t"
-            . $dsatz["Lvl"] . "\t" . "|";
+            echo $dsatz["Nickname"] . "?"
+            . $dsatz["SelectedSkin"] . "?" // \t um später in Unity die Daten auseinander zu nehmen
+            . $dsatz["Coins"] . "?"
+            . $dsatz["Emeralds"] . "?"
+            . $dsatz["Wins"] . "?"
+            . $dsatz["Kills"] . "?"
+            . $dsatz["Lvl"] . "?"
+            . $dsatz["id"] . "?" . "|";
         } 
+    }
+}else if($getshopinfo == "1"){
+    $querry = "SELECT * FROM ShopInfo";
+    $result = $mysqli->query($querry);
+    if(!$result){
+        printf("%s\n", $mysqli -> error);
+        exit();
+    }else{
+        $rows = $result->fetch_all(MYSQLI_ASSOC);
+        foreach ($rows as $dsatz) {
+            echo $dsatz["Skin1"] . "?"
+            . $dsatz["Rarity1"] . "?" // \t um später in Unity die Daten auseinander zu nehmen
+            . $dsatz["Skin2"] . "?"
+            . $dsatz["Rarity2"] . "?"
+            . $dsatz["Skin3"] . "?"
+            . $dsatz["Rarity3"] . "?"
+            . $dsatz["Skin4"] . "?"
+            . $dsatz["Rarity4"] . "?"
+            . $dsatz["Skin5"] . "?"
+            . $dsatz["Rarity5"]; //rarity ist die seltenheit angegeben von 1-5
+        }
     }
 }
 $mysqli->close();

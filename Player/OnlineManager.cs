@@ -7,14 +7,15 @@ using System;
 public class OnlineManager : MonoBehaviour
 {
     public static string[] RecievedData; //Vor zugriff muss GetAllUserData() gcallt werden um die die daten aus der datenbank zu bekommen //[0] = Nickname [1] = SelectedSkin [2] = Coins [3] = Emeralds [4] = Wins [5] = Kills
-    public static string[][] GlobalBest = new string[5][]; //20 Spiele mit jeweils 7 Datensätzen
+    public static string[][] GlobalBest = new string[20][]; //20 Spieler mit jeweils 7 Daten
     public static int NewID = 0;
     public static int FriendExistance;
+    public static string[] Shopinfo = new string[10];
 
     private void Awake() {
         //init GlobalBest Array
-        for(int i = 0; i != 4; i++){
-            GlobalBest[i] = new string[7];
+        for(int i = 0; i != 20; i++){
+            GlobalBest[i] = new string[8];
         }
     }
     public static IEnumerator RegisterNewUserOnDatabase(){
@@ -88,6 +89,7 @@ public class OnlineManager : MonoBehaviour
         WWWForm form = new WWWForm();
         //Daten Aktualisieren
         form.AddField("Update","1");
+        form.AddField("id", Menu_Handler.loadeddata.PlayerID); //User Daten zum suchen in der Datenbank
         form.AddField("Nickname", Menu_Handler.loadeddata.Saved_Player_Name);
         form.AddField("SelectedSkin", Menu_Handler.loadeddata.SelectedSkin);
         form.AddField("Coins", Menu_Handler.loadeddata.Saved_Coins);
@@ -96,6 +98,8 @@ public class OnlineManager : MonoBehaviour
         form.AddField("Kills", Menu_Handler.loadeddata.Kills);
         form.AddField("Level", Menu_Handler.loadeddata.Level);
         UnityWebRequest www = UnityWebRequest.Post("http://192.168.0.187/BBR/BBR.php", form); //Connect to Webserver
+        DownloadHandlerBuffer dh = new DownloadHandlerBuffer(); //neuer download buffer weil sonst bug
+        www.downloadHandler = dh; //download buffer zuweisen
         yield return www.SendWebRequest(); //Warte bis Anfrage fertig ist.
         www.Dispose(); //Schieße die Connection damit C# keinen Memory leck erleided
     }
@@ -106,6 +110,8 @@ public class OnlineManager : MonoBehaviour
         form.AddField("id", Menu_Handler.loadeddata.PlayerID);
         form.AddField("Nickname", Menu_Handler.loadeddata.Saved_Player_Name);
         UnityWebRequest www = UnityWebRequest.Post("http://192.168.0.187/BBR/BBR.php", form); //Connect to Webserver
+        DownloadHandlerBuffer dh = new DownloadHandlerBuffer(); //neuer download buffer weil sonst bug
+        www.downloadHandler = dh; //download buffer zuweisen
         yield return www.SendWebRequest(); //Warte bis Anfrage fertig ist.
         if((www.result == UnityWebRequest.Result.ConnectionError)){ //schau ob error
             Debug.Log("SERVER CONNECTION ERROR");
@@ -139,7 +145,7 @@ public class OnlineManager : MonoBehaviour
         yield return www.SendWebRequest(); //Warte bis Anfrage fertig ist.
         www.Dispose(); //Schieße die Connection damit C# keinen Memory leck erleided
     }
-    public static IEnumerator GetTop30(){
+    public static IEnumerator GetTop20(){
         //Frage Ganze liste an allen Spielern an.
         //Server Sortiert nach Top 30 und gibt die Platzierung wieder.
         //Zum schluss wird dann die eigene Position errechnet
@@ -153,21 +159,31 @@ public class OnlineManager : MonoBehaviour
             Debug.Log("SERVER CONNECTION ERROR");
         }else{
             RecievedData = www.downloadHandler.text.Split("|");
-            int dimension1 = 0;
-            int dimension2 = 0;
-            foreach(string i in RecievedData){
-                Debug.Log(i);                
-            }
-            /*foreach(string i in RecievedData){ //Teile die eine Array in einzelne Datensätze aus
-                GlobalBest[dimension1][dimension2] = i; //hier weiter arbeiten
-                dimension2++;
-                if(i == "\n"){
-                    dimension1++;
-                    dimension2 = 0;
+            int x = 0;
+            int counter = 0; //Counter prevents from last cycle in loop because string.Split Splits the last Space into an array
+            foreach(string i in RecievedData){ //Teile die einzelnen Strings in die einzelteile auf.
+                if(counter != 20){
+                    GlobalBest[x] = i.Split("?");
+                    if(x != 20)x++;
                 }
-            }*/
-            Debug.Log(GlobalBest[0][0]);
+                counter++;
+            }
         }
         www.Dispose(); //Schieße die Connection damit C# keinen Memory leck erleided
+    }
+    public static IEnumerator GetShopInfo(){
+        WWWForm form = new WWWForm();
+        //Daten Aktualisieren
+        form.AddField("getshopinfo", "1");
+        UnityWebRequest www = UnityWebRequest.Post("http://192.168.0.187/BBR/BBR.php", form); //Connect to Webserver
+        yield return www.SendWebRequest(); //Warte bis Anfrage fertig ist.
+        if((www.result == UnityWebRequest.Result.ConnectionError)){ //schau ob error
+            Debug.Log("SERVER CONNECTION ERROR");
+        }else{
+            //return die Shop info
+            Shopinfo = www.downloadHandler.text.Split("?");
+        }
+        www.Dispose(); //Schieße die Connection damit C# keinen Memory leck erleided
+        yield return null;
     }
 }
