@@ -40,7 +40,7 @@ public class Movement : MonoBehaviour
 
     void Awake(){
         //Performance Settings from Menu
-        /*if(Menu_Handler.performancemode == false){
+        if(Menu_Handler.performancemode == false){
             //-Low Performance settings-
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = 30;
@@ -55,7 +55,7 @@ public class Movement : MonoBehaviour
         }
         //Setz den Player auf die im Dropoff Screen angegebene Position
         //Skin Laden
-        LoadPlayerSkin();*/
+        LoadPlayerSkin();
         Joystick1handle = joystick1.transform.Find("Handle").gameObject;
     }
 

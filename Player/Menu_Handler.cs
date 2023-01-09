@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.Advertisements;
+using TMPro;
 
 public class Menu_Handler : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class Menu_Handler : MonoBehaviour
     public GameObject[] BGPoints;
     public int Coins; //Muss noch Automatisch gezählt werden wird aber vorerst auf 123 Gesetzt
     public static string Player_Name = "Player";
-    public static int Menu_Bots = 1;
+    public static int Menu_Bots = 20;
     public float CAMSPEED = 0.001f;
     public float Playerspinspeed;
     public static bool performancemode = true;
@@ -24,6 +25,8 @@ public class Menu_Handler : MonoBehaviour
     public static UserData localdata = new UserData(); //Sofort das Localdata object erstellen damit sofort zum launch des spiels daten gelesen/geschrieben werden können
     public static UserData loadeddata;
     private GameObject activeBG;
+    public GameObject RewardWindowPrefab;
+    public RectTransform RewardWindowPos;
     private string[] sonderzeichen = {"!","§","$","%","&","/","(",")","=","?","}","]","[","{","³","²","^","°","<",">","|","+","*","~",",",":",";","-","_","\u00b4" /*´*/,"`", "'\u0022'"/*backslash*/};
     //Skins
     [SerializeField] private Sprite DefaultSkinSprite, BetaSkinSprite, AgentSkinSprite, OttoSkinSprite, ClownSkinSprite, AlienSkinSprite, ChrisSkinSprite;
@@ -106,10 +109,23 @@ public class Menu_Handler : MonoBehaviour
     //Ads
     [SerializeField] private GameObject AdButton;
     private static int AdCounter = 0;
-    private static int Watchedads = 0;
-
+    public static int Watchedads = 0;
+    private static int loadadcounter = 0;
+    public static bool EmeraldAd = false;
+    [SerializeField] private Sprite EmeraldAdButtonSprite;
+    [SerializeField] private Sprite CoinAdButtonSprite;
+    private bool OfflineMode = false;
+    //else
+    private static Menu_Handler instance;
+    private GameObject RewardWindowObject;
+    public static int x;
 
     void Awake(){
+        instance = this;
+        //50 50 ob Ad Button erscheint
+        int randnum = UnityEngine.Random.Range(0, 2);
+        if(randnum == 1) AdCounter = 0;
+        else AdCounter = 1;
         AdCounter++;
         ChooseBG();
         DecideAdButton(); //Ad Button Erscheint nur jedes 2te mal
@@ -118,6 +134,9 @@ public class Menu_Handler : MonoBehaviour
         StartCoroutine(ButtonAnimation());
         StartCoroutine(TryToHoldConnection());
         StartCoroutine(AdAnimation());
+        //Init Ads
+        if(loadadcounter >= 1) AdButton.GetComponent<RewardedAdsButton>().LoadAd();  //Aber nur nach dem ersten start   
+        loadadcounter++;
     }
 
     void Start(){
@@ -145,7 +164,7 @@ public class Menu_Handler : MonoBehaviour
         file.Close();
     }
 
-    public void Readdata(){
+    public static void Readdata(){
         if(File.Exists(Application.persistentDataPath + "/save.dat")){
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open(Application.persistentDataPath + "/save.dat", FileMode.Open);
@@ -237,22 +256,98 @@ public class Menu_Handler : MonoBehaviour
                 localdata.Level++; //Level up
                 localdata.TonextLevelXP += (int)(localdata.TonextLevelXP / 4) + 20; //Immer 30xp mehr pro höheres level
                 if(localdata.Level % 10 == 0){ //Jedes 10 level eine coin
-                    AddEmerald(1);
+                    //AddEmerald(1);
+                    //Darf erst ausgeführt werden wenn Title Menu Scene Geladen ist
                 }
             }
         }
         Writedata(localdata); //Save
     }
-    public static void AddEmerald(int ammount){
+    public static IEnumerator AddEmerald(int ammount){
+        localdata = loadeddata;
         localdata.Saved_Emeralds += ammount;
-        Writedata(localdata);
         //Display
         GameObject.Find("Emerald Counter").transform.Find("Counter").GetComponent<Text>().text = localdata.Saved_Emeralds.ToString(); //Muss so gesucht werden methode statisch ist
-        
+        Writedata(localdata);
+        yield return new WaitForEndOfFrame();
+        Readdata();
+        localdata = loadeddata;
+        instance.StartCoroutine(RewardWindow("Emerald", ammount));
     }
-    public static void ItemAddedWindow(int amount, string type){
-
+    public static IEnumerator AddCoins(int ammount){
+        localdata = loadeddata;
+        localdata.Saved_Coins += ammount;
+        //Display
+        GameObject.Find("Coin Counter").transform.Find("Counter").GetComponent<Text>().text = localdata.Saved_Coins.ToString(); //Muss so gesucht werden methode statisch ist
+        Writedata(localdata);
+        yield return new WaitForEndOfFrame();
+        Readdata();
+        localdata = loadeddata;
+        instance.StartCoroutine(RewardWindow("Coin", ammount));
     }
+    public static IEnumerator RewardWindow(string type, int amount){ //Muss static sein da es von anderen static scripts aufgerufen wird
+        //Hide UI
+        instance.Player.SetActive(false);
+        instance.Shop_Button.SetActive(false);
+        instance.Play_Button.SetActive(false);
+        instance.Coin_Counter.SetActive(false);
+        instance.Emerald_Counter.SetActive(false);
+        instance.Player_Name_Button.SetActive(false);
+        instance.Player_Name_Text.gameObject.SetActive(false);
+        instance.Friends_Button.gameObject.SetActive(false);
+        instance.Inv_Button.gameObject.SetActive(false);
+        instance.Settings_Button.gameObject.SetActive(false);
+        instance.Logo.gameObject.SetActive(false);
+        instance.Name_Input.SetActive(false);
+        instance.Leveltext.gameObject.SetActive(false);
+        instance.ProgressBar.gameObject.SetActive(false);
+        instance.ProgressBarBG.gameObject.SetActive(false);
+        instance.neededXP.gameObject.SetActive(false);
+        instance.GlobalLeaderboardScroll.SetActive(false);
+        instance.AdButton.SetActive(false);
+        //Show Reward Window
+        instance.RewardWindowObject = Instantiate(instance.RewardWindowPrefab, instance.RewardWindowPos);
+        if(type == "Coin"){ //Coin
+            instance.RewardWindowObject.transform.parent = instance.RewardWindowPos;
+            instance.RewardWindowObject.GetComponent<RectTransform>().localPosition = new Vector3(0,0,0); //Center
+            //Set Icon
+            instance.RewardWindowObject.transform.Find("Coin").gameObject.GetComponent<Image>().sprite = instance.CoinIcon;
+            //Count up the coins
+            yield return new WaitForSeconds(0.3f);
+            for(int i = 0; i <= amount ; i++){
+                instance.RewardWindowObject.transform.Find("Amount").gameObject.GetComponent<TextMeshProUGUI>().text = i.ToString();
+                yield return new WaitForSeconds(0.1f);
+            }
+            //OK Button
+            instance.RewardWindowObject.transform.Find("Ok").GetComponent<Button>().onClick.AddListener(() => {
+                Destroy(instance.RewardWindowObject);
+                //Show UI
+                instance.SettingsExit();
+                instance.AdButton.gameObject.GetComponent<Image>().enabled = true;
+                instance.AdButton.gameObject.GetComponent<Button>().enabled = true; //Wird sonst eingebledet (Hot Fix)
+            });
+        }else{ //Emerald
+            instance.RewardWindowObject.transform.parent = instance.RewardWindowPos;
+            instance.RewardWindowObject.GetComponent<RectTransform>().localPosition = new Vector3(0,0,0); //Center
+            //Set Icon
+            instance.RewardWindowObject.transform.Find("Coin").gameObject.GetComponent<Image>().sprite = instance.EmeraldIcon;
+            //Count up the coins
+            yield return new WaitForSeconds(0.3f);
+            for(int i = 0; i <= amount ; i++){
+                instance.RewardWindowObject.transform.Find("Amount").gameObject.GetComponent<TextMeshProUGUI>().text = i.ToString();
+                yield return new WaitForSeconds(0.1f);
+            }
+            //OK Button
+            instance.RewardWindowObject.transform.Find("Ok").GetComponent<Button>().onClick.AddListener(() => {
+                Destroy(instance.RewardWindowObject);
+                //Show UI
+                instance.SettingsExit();
+                instance.AdButton.gameObject.GetComponent<Image>().enabled = true;
+                instance.AdButton.gameObject.GetComponent<Button>().enabled = true;
+            });
+        }
+    }
+    
     public void ChooseBG(){
         int BGnum = UnityEngine.Random.Range(0,4);
         if(BGnum == 0){
@@ -297,23 +392,25 @@ public class Menu_Handler : MonoBehaviour
                 Play_ButtonRect.localScale = new Vector3(Play_ButtonRect.localScale.x - .01f,Play_ButtonRect.localScale.y - .01f,0f);
                 yield return new WaitForSeconds(.03f);
             }
-            //Friends Button
-            for(int i = 0; i != 10; i++){ //ZOOM IN
-                Friends_ButtonRect.localScale = new Vector3(Friends_ButtonRect.localScale.x +.01f,Friends_ButtonRect.localScale.y + .01f,0f);
-                yield return new WaitForSeconds(.025f);
-            }
-            for(int i = 10; i != 0; i--){ //ZOOM OUT
-                Friends_ButtonRect.localScale = new Vector3(Friends_ButtonRect.localScale.x - .01f,Friends_ButtonRect.localScale.y - .01f,0f);
-                yield return new WaitForSeconds(.025f);
-            }
-            //Shop Button
-            for(int i = 0; i != 10; i++){ //ZOOM IN
-                Shop_ButtonRect.localScale = new Vector3(Shop_ButtonRect.localScale.x +.01f,Shop_ButtonRect.localScale.y + .01f,0f);
-                yield return new WaitForSeconds(.025f);
-            }
-            for(int i = 10; i != 0; i--){ //ZOOM OUT
-                Shop_ButtonRect.localScale = new Vector3(Shop_ButtonRect.localScale.x - .01f,Shop_ButtonRect.localScale.y - .01f,0f);
-                yield return new WaitForSeconds(.025f);
+            if(!OfflineMode){
+                //Friends Button
+                for(int i = 0; i != 10; i++){ //ZOOM IN
+                    Friends_ButtonRect.localScale = new Vector3(Friends_ButtonRect.localScale.x +.01f,Friends_ButtonRect.localScale.y + .01f,0f);
+                    yield return new WaitForSeconds(.025f);
+                }
+                for(int i = 10; i != 0; i--){ //ZOOM OUT
+                    Friends_ButtonRect.localScale = new Vector3(Friends_ButtonRect.localScale.x - .01f,Friends_ButtonRect.localScale.y - .01f,0f);
+                    yield return new WaitForSeconds(.025f);
+                }
+                //Shop Button
+                for(int i = 0; i != 10; i++){ //ZOOM IN
+                    Shop_ButtonRect.localScale = new Vector3(Shop_ButtonRect.localScale.x +.01f,Shop_ButtonRect.localScale.y + .01f,0f);
+                    yield return new WaitForSeconds(.025f);
+                }
+                for(int i = 10; i != 0; i--){ //ZOOM OUT
+                    Shop_ButtonRect.localScale = new Vector3(Shop_ButtonRect.localScale.x - .01f,Shop_ButtonRect.localScale.y - .01f,0f);
+                    yield return new WaitForSeconds(.025f);
+                }
             }
             //Inv Button
             for(int i = 0; i != 10; i++){ //ZOOM IN
@@ -364,17 +461,27 @@ public class Menu_Handler : MonoBehaviour
         }
 
     }
-    public void DecideAdButton(){ //Checkt ob der User Eine Internet Verbindung hat und zeigt den Ad Button an oder nicht
+    public static void DecideAdButton(){ //Checkt ob der User Eine Internet Verbindung hat und zeigt den Ad Button an oder nicht
         if(Application.internetReachability == NetworkReachability.NotReachable){
-            AdButton.SetActive(false);
+            instance.AdButton.SetActive(false);
         }else{
             //Schaue nun ob der nutzer schon ein Ad gesehen hat
             if(AdCounter % 2 == 0){ //Wenn der AdCounter gerade ist, dann zeige den Ad Button an
                 if(Watchedads < 2){
-                    AdButton.SetActive(true);
+                    //Zufall ob Emerald oder Coin
+                    if(x == 5){
+                        //Zeige den Emerald Ad Button
+                        instance.AdButton.GetComponent<Image>().sprite = instance.EmeraldAdButtonSprite;
+                        EmeraldAd = true;
+                    }else{
+                        //Zeige den Coin Ad Button
+                        instance.AdButton.GetComponent<Image>().sprite = instance.CoinAdButtonSprite;
+                        EmeraldAd = false;
+                    }
+                    instance.AdButton.SetActive(true);
                 }
             }else{
-                AdButton.SetActive(false);
+                instance.AdButton.SetActive(false);
             }
         }
     }
@@ -391,6 +498,9 @@ public class Menu_Handler : MonoBehaviour
                 AdButton.SetActive(false);
                 //Zeige das No Connection Icon
                 NoConnectionIcon.SetActive(true);
+                //Zurück ins Menü
+                SettingsExit();
+                OfflineMode = true;
             }else{
                 //Mach den Online Button wieder normal
                 Friends_Button.GetComponent<Image>().sprite = FriendsButtonSprite;
@@ -402,12 +512,10 @@ public class Menu_Handler : MonoBehaviour
                 DecideAdButton();
                 //Zeige nicht das No Connection Icon
                 NoConnectionIcon.SetActive(false);
+                OfflineMode = false;
             }
             yield return new WaitForSeconds(5f);
         }
-    }
-    public void ViewAd(){
-        Watchedads++;
     }
     public void FriendButtonMenu(){
         if(Application.internetReachability != NetworkReachability.NotReachable){
@@ -432,15 +540,14 @@ public class Menu_Handler : MonoBehaviour
         Logo.gameObject.SetActive(false);
         Name_Input.SetActive(false);
         activeBG.SetActive(false);
-        AddBotButton.SetActive(false);
-        RemoveBotButton.SetActive(false);
-        Bot_Display.SetActive(false);
         Leveltext.gameObject.SetActive(false);
         ProgressBar.gameObject.SetActive(false);
         ProgressBarBG.gameObject.SetActive(false);
         neededXP.gameObject.SetActive(false);
         GlobalLeaderboardScroll.SetActive(false);
         AdButton.SetActive(false);
+        instance.AdButton.gameObject.GetComponent<Image>().enabled = false;
+        instance.AdButton.gameObject.GetComponent<Button>().enabled = false;
 
         onlineBG.SetActive(true);
         X_Friends.SetActive(true);
@@ -729,14 +836,13 @@ public class Menu_Handler : MonoBehaviour
         Logo.gameObject.SetActive(false);
         Name_Input.SetActive(false);
         activeBG.SetActive(false);
-        AddBotButton.SetActive(false);
-        RemoveBotButton.SetActive(false);
-        Bot_Display.SetActive(false);
         Leveltext.gameObject.SetActive(false);
         ProgressBar.gameObject.SetActive(false);
         ProgressBarBG.gameObject.SetActive(false);
         neededXP.gameObject.SetActive(false);
         AdButton.SetActive(false);
+        instance.AdButton.gameObject.GetComponent<Image>().enabled = false;
+        instance.AdButton.gameObject.GetComponent<Button>().enabled = false;
 
         ShopBG.SetActive(true);
         X_Shop.SetActive(true);
@@ -954,13 +1060,12 @@ public class Menu_Handler : MonoBehaviour
         Logo.gameObject.SetActive(false);
         Name_Input.SetActive(false);
         activeBG.SetActive(false);
-        AddBotButton.SetActive(false);
-        RemoveBotButton.SetActive(false);
-        Bot_Display.SetActive(false);
         Leveltext.gameObject.SetActive(false);
         ProgressBar.gameObject.SetActive(false);
         ProgressBarBG.gameObject.SetActive(false);
         neededXP.gameObject.SetActive(false);
+        instance.AdButton.gameObject.GetComponent<Image>().enabled = false;
+        instance.AdButton.gameObject.GetComponent<Button>().enabled = false;
 
 
         //Activate Inventory
@@ -985,6 +1090,8 @@ public class Menu_Handler : MonoBehaviour
         ProgressBar.gameObject.SetActive(false);
         ProgressBarBG.gameObject.SetActive(false);
         neededXP.gameObject.SetActive(false);
+        instance.AdButton.gameObject.GetComponent<Image>().enabled = true;
+        instance.AdButton.gameObject.GetComponent<Button>().enabled = true;
 
         Name_Input.SetActive(true); //Input Field
     }
@@ -1067,6 +1174,7 @@ public class Menu_Handler : MonoBehaviour
         Logo.gameObject.SetActive(false);
         Name_Input.SetActive(false);
         Settings_Button.gameObject.SetActive(false);
+        AdButton.SetActive(false);
 
         Settings_Menu_X.gameObject.SetActive(true);
         Settings_Menu.gameObject.SetActive(true);
@@ -1085,10 +1193,9 @@ public class Menu_Handler : MonoBehaviour
         Logo.gameObject.SetActive(true);
         Name_Input.SetActive(false);
         Settings_Button.gameObject.SetActive(true);
-        AddBotButton.SetActive(true);
-        RemoveBotButton.SetActive(true);
-        Bot_Display.SetActive(true);
-        DecideAdButton();
+        //Ad
+        instance.AdButton.gameObject.GetComponent<Image>().enabled = true;
+        instance.AdButton.gameObject.GetComponent<Button>().enabled = true;
 
         Settings_Menu_X.gameObject.SetActive(false);
         Settings_Menu.gameObject.SetActive(false);

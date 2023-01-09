@@ -158,6 +158,9 @@ public class UI_Handler : MonoBehaviour
         Image DeathPointIMG = DeathWinPoint.gameObject.GetComponent<Image>();
         //Blend Langsam das Fenster ein
         for(int runs = 0; runs != 255; runs++){
+            // Debug.Log(runs);
+            // Debug.Log(StatwindowIMG.color.a);
+            // Debug.Log(Time.timeScale);
             StatwindowIMG.color = new Color(StatwindowIMG.color.r, StatwindowIMG.color.g, StatwindowIMG.color.b, StatwindowIMG.color.a + 0.003921568627451f); //0.003921568627451f stellt 1 dar. da alpha von 0 bis 255 geht und alpha aber im code zwischen 0-1 bestimmt werden muss also 255/1 = 0.003921568627451f
             KillsTEXT.color = new Color(0f, 0f, 0f, KillsTEXT.color.a + 0.003921568627451f);
             if(Place.text == "1") PlaceTEXT.color = new Color(255f, 255f, 0f, PlaceTEXT.color.a + 0.003921568627451f);
@@ -213,6 +216,8 @@ public class UI_Handler : MonoBehaviour
         }
         Menu_Handler.Writedata(Menu_Handler.localdata); //Stage changes
         Menu_Handler.AddXP(GiveXP); //XP Geben
+        //Nach 1 runde darf man wieder Ads Schauen
+        Menu_Handler.Watchedads = 0;
         //Write to Database
         StartCoroutine(OnlineManager.UpdateAfterGame());
     }

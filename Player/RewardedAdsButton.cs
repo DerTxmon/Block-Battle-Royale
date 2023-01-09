@@ -19,7 +19,6 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
 #endif
 
         //Disable the button until the ad is ready to show:
-        _showAdButton.interactable = false;
     }
  
     // Load content to the Ad Unit:
@@ -40,7 +39,9 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
             // Configure the button to call the ShowAd() method when clicked:
             _showAdButton.onClick.AddListener(ShowAd);
             // Enable the button for users to click:
-            _showAdButton.interactable = true;
+
+            Menu_Handler.x = UnityEngine.Random.Range(0,9);
+            Menu_Handler.DecideAdButton();
         }
     }
  
@@ -48,7 +49,6 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
     public void ShowAd()
     {
         // Disable the button:
-        _showAdButton.interactable = false;
         // Then show the ad:
         Advertisement.Show(_adUnitId, this);
     }
@@ -59,8 +59,18 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
         if (adUnitId.Equals(_adUnitId) && showCompletionState.Equals(UnityAdsShowCompletionState.COMPLETED))
         {
             Debug.Log("Unity Ads Rewarded Ad Completed");
+            //Mach den Butten Hier Unsichtbar. Wird im Menu Handler wieder aufgehoben vom OK Button
+            _showAdButton.gameObject.GetComponent<Image>().enabled = false;
+            _showAdButton.gameObject.GetComponent<Button>().enabled = false;
             // Grant a reward.
-            Menu_Handler.AddEmerald(1);
+            Menu_Handler.Watchedads++;
+            if(Menu_Handler.EmeraldAd == true){
+                StartCoroutine(Menu_Handler.AddEmerald(1));
+            }else{
+                StartCoroutine(Menu_Handler.AddCoins(3));
+            }
+            //Kill all listeners
+            _showAdButton.onClick.RemoveAllListeners();
             // Load another ad:
             Advertisement.Load(_adUnitId, this);
         }
