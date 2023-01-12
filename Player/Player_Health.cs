@@ -45,10 +45,10 @@ public class Player_Health : MonoBehaviour
     public IEnumerator Death(){
         //Langsam Zeit runter schrauben
         while(Time.timeScale != .1f){
-            yield return new WaitForSeconds(.2f);
+            yield return new WaitForSeconds(.1f);
             float applytotime = Time.timeScale -.1f;
-            Time.timeScale = (float)System.Math.Round(applytotime * 100) / 100;
+            Time.timeScale = (float)System.Math.Round(applytotime * 100) / 100; //Rundet auf 2 Nachkommastellen
         }
-        StartCoroutine(UI.EndScreen());
+        StartCoroutine(UI.EndScreen(false));
     }
 }

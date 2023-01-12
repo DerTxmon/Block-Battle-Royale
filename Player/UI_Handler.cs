@@ -25,9 +25,10 @@ public class UI_Handler : MonoBehaviour
     public List<Text> HudComponents_Text;
     private float x;
     public GameObject[] MapTexte;
-    public GameObject World;
+    public GameObject World, DeathWinPoint;
+    public Sprite WinIcon, DeathIcon;
+    private int GiveXP;
     void Awake() {
-        World = GameObject.Find("World");
         foreach(GameObject i in HUD){
             if(i.GetComponent<SpriteRenderer>() != null){
                 HudComponents_Sprites.Add(i.gameObject.GetComponent<SpriteRenderer>()); //Nimmt jedes GameObject aus dem Hud und trägt den Color component in eine liste ein um beim tod das hud langsam aus zublenden
@@ -96,6 +97,12 @@ public class UI_Handler : MonoBehaviour
         if(World.GetComponent<Map_Manager>().Playercount == 1){ //Wenn Gewonnen + 10 Extra Coins
             givecoins += 10;
         }
+        //Calc XP
+        GiveXP = 0;
+        GiveXP += Inv.Kills * 7; //Jeder Kill gibt 7XP
+        double tobeconverted = (int)World.GetComponent<Map_Manager>().SurvivedTime * 0.05; //runde die survived time auf einen int
+        GiveXP += (int)tobeconverted; //25 Sekunden survived time geben 1 XP
+
         //Zähl die coins später in einer animation hoch
         CoinsEarned.text = "0";
     }
@@ -114,30 +121,56 @@ public class UI_Handler : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
     }
-    public IEnumerator EndScreen(){
+    public void CalcDeathWinPoint(){
+        //oben Rechts Auf der Map: X 527 Y 527
+        //oben Rechts Auf der Minimap: X 223 Y 223 
+        //Differenz: 2,36322869955157
+        DeathWinPoint.SetActive(true);
+        //Entscheide ob der Todes sprite oder Win Sprite angezeigt werden soll
+        if(World.GetComponent<Map_Manager>().Playercount == 1) DeathWinPoint.GetComponent<Image>().sprite = WinIcon;
+        else DeathWinPoint.GetComponent<Image>().sprite = DeathIcon;
+        //Übersetz die Welt Position in Minimap Cooridinaten und Setz den Punkt da hin
+        Vector3 thispos = this.gameObject.transform.position;
+        DeathWinPoint.GetComponent<RectTransform>().localPosition = new Vector3(thispos.x / 2.36322869955157f, thispos.y / 2.36322869955157f, 0);
+    }
+    public IEnumerator EndScreen(bool win){
         //Spieler Scripts deaktivieren so das er nichts mehr machen kann wie rum laufen oder schießen
         this.gameObject.GetComponent<Movement>().enabled = false;
         this.gameObject.GetComponent<Shoot>().enabled = false;
         //Zieh die infos die die stats brauchen aus den jeweiligen scripts
         Calcstats();
+        //Setz den Win oder Lose point auf der Minimap
+        CalcDeathWinPoint();
         StatWindow.SetActive(true);
         MinimapCam.SetActive(true);
         //Schalte alle Texte auf der Map aus
         foreach(GameObject i in MapTexte){
             i.gameObject.SetActive(false);
         }
+        Image StatwindowIMG = StatWindow.GetComponent<Image>(); //Jedes Stat element einmal in den Cache packen damit wir nicht jeden frame GetComponent machen müssen.
+        Text KillsTEXT = Kills.gameObject.GetComponent<Text>();
+        Text PlaceTEXT = Place.gameObject.GetComponent<Text>();
+        Text DamageTEXT = Damage.gameObject.GetComponent<Text>();
+        Text SurvivedTimeTEXT = SurvivedTime.gameObject.GetComponent<Text>();
+        Text CoinsearnedTEXT = CoinsEarned.gameObject.GetComponent<Text>();
+        RawImage MinimapDeathIMG = MinmapDeathTexture.gameObject.GetComponent<RawImage>();
+        Image StatsBacktoHomeIMG = Stats_BacktohomeButton.gameObject.GetComponent<Image>();
+        Image DeathPointIMG = DeathWinPoint.gameObject.GetComponent<Image>();
         //Blend Langsam das Fenster ein
-        Time.timeScale = 1;
         for(int runs = 0; runs != 255; runs++){
-            StatWindow.GetComponent<Image>().color = new Color(StatWindow.GetComponent<Image>().color.r, StatWindow.GetComponent<Image>().color.g, StatWindow.GetComponent<Image>().color.b, StatWindow.GetComponent<Image>().color.a + 0.003921568627451f); //0.003921568627451f stellt 1 dar. da alpha von 0 bis 255 geht und alpha aber im code zwischen 0-1 bestimmt werden muss also 255/1 = 0.003921568627451f
-            Kills.gameObject.GetComponent<Text>().color = new Color(0f, 0f, 0f, Kills.gameObject.GetComponent<Text>().color.a + 0.003921568627451f);
-            if(Place.text == "1") Place.gameObject.GetComponent<Text>().color = new Color(255f, 255f, 0f, Place.gameObject.GetComponent<Text>().color.a + 0.003921568627451f);
-            else Place.gameObject.GetComponent<Text>().color = new Color(0f, 0f, 0f, Place.gameObject.GetComponent<Text>().color.a + 0.003921568627451f); //wenn erster platz mache text gelb
-            Damage.gameObject.GetComponent<Text>().color = new Color(0f, 0f, 0f, Damage.gameObject.GetComponent<Text>().color.a + 0.003921568627451f);
-            SurvivedTime.gameObject.GetComponent<Text>().color = new Color(0f, 0f, 0f, SurvivedTime.gameObject.GetComponent<Text>().color.a + 0.003921568627451f); //0f bei r g und b für den code schwarz
-            CoinsEarned.gameObject.GetComponent<Text>().color = new Color (0f, 255f, 255f, CoinsEarned.GetComponent<Text>().color.a + 0.003921568627451f);
-            MinmapDeathTexture.gameObject.GetComponent<RawImage>().color = new Color(255f, 255f, 255f, MinmapDeathTexture.GetComponent<RawImage>().color.a + 0.003921568627451f);
-            Stats_BacktohomeButton.gameObject.GetComponent<Image>().color = new Color(255f,255f,255f, Stats_BacktohomeButton.GetComponent<Image>().color.a + 0.003921568627451f);
+            // Debug.Log(runs);
+            // Debug.Log(StatwindowIMG.color.a);
+            // Debug.Log(Time.timeScale);
+            StatwindowIMG.color = new Color(StatwindowIMG.color.r, StatwindowIMG.color.g, StatwindowIMG.color.b, StatwindowIMG.color.a + 0.003921568627451f); //0.003921568627451f stellt 1 dar. da alpha von 0 bis 255 geht und alpha aber im code zwischen 0-1 bestimmt werden muss also 255/1 = 0.003921568627451f
+            KillsTEXT.color = new Color(0f, 0f, 0f, KillsTEXT.color.a + 0.003921568627451f);
+            if(Place.text == "1") PlaceTEXT.color = new Color(255f, 255f, 0f, PlaceTEXT.color.a + 0.003921568627451f);
+            else PlaceTEXT.color = new Color(0f, 0f, 0f, PlaceTEXT.color.a + 0.003921568627451f); //wenn erster platz mache text gelb
+            DamageTEXT.color = new Color(0f, 0f, 0f, DamageTEXT.color.a + 0.003921568627451f);
+            SurvivedTimeTEXT.color = new Color(0f, 0f, 0f, SurvivedTimeTEXT.color.a + 0.003921568627451f); //0f bei r g und b für den code schwarz
+            CoinsearnedTEXT.color = new Color (0f, 255f, 255f, CoinsearnedTEXT.color.a + 0.003921568627451f);
+            MinimapDeathIMG.color = new Color(255f, 255f, 255f, MinimapDeathIMG.color.a + 0.003921568627451f);
+            StatsBacktoHomeIMG.color = new Color(255f,255f,255f, StatsBacktoHomeIMG.color.a + 0.003921568627451f);
+            DeathPointIMG.color = new Color(255f, 255f, 255f, DeathPointIMG.color.a + 0.003921568627451f);
             //Hintergrund parallel ausblenden
             foreach(Image i in HudComponents_Img){
                 i.color = new Color(i.color.r, i.color.g, i.color.b, i.color.a - 0.003921568627451f);
@@ -174,15 +207,18 @@ public class UI_Handler : MonoBehaviour
             CoinsEarned.text = y.ToString();
             yield return new WaitForEndOfFrame();
         }
-        //StartCoroutine(Zoominout());
-        //Save Stats to save.json
+        Menu_Handler.localdata = Menu_Handler.loadeddata;
         Menu_Handler.localdata.Kills = Menu_Handler.loadeddata.Kills + givecoins; //Kills 
         Menu_Handler.localdata.Saved_Coins = Menu_Handler.loadeddata.Saved_Coins + givecoins; //Coins (Schon gespeicherte coins + neu verdient)
-        Menu_Handler.localdata.Wins = Menu_Handler.loadeddata.Wins;
-        Menu_Handler.localdata.Saved_Player_Name = Menu_Handler.loadeddata.Saved_Player_Name; //Name bleibt gleich
-        Menu_Handler.localdata.PlayerID = Menu_Handler.loadeddata.PlayerID;
-        Menu_Handler.Writedata(); //Stage changes
-        
-        Time.timeScale = 0f;
+        if(win){
+            Menu_Handler.localdata.Wins = Menu_Handler.loadeddata.Wins + 1;
+            GiveXP += 25;
+        }
+        Menu_Handler.Writedata(Menu_Handler.localdata); //Stage changes
+        Menu_Handler.AddXP(GiveXP); //XP Geben
+        //Nach 1 runde darf man wieder Ads Schauen
+        Menu_Handler.Watchedads = 0;
+        //Write to Database
+        StartCoroutine(OnlineManager.UpdateAfterGame());
     }
 }

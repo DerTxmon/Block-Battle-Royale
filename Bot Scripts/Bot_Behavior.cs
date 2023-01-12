@@ -216,7 +216,7 @@ public class Bot_Behavior : MonoBehaviour
     public IEnumerator CheckforPlayerDistance(){
         while(true){
             Player_Distance = Vector2.Distance(new Vector2(Player.transform.position.x, Player.transform.position.y), new Vector2(this.gameObject.transform.position.x, this.gameObject.transform.position.y)); //misst wie weit der Bot vom Player weg ist um dann zu schauen ob Footsteps generiert werden müssen
-            if(Player_Distance < 29f){
+            if(Player_Distance < 70f){
                 spawn_steps = true;
             }else spawn_steps = false;
             yield return new WaitForSeconds(3f);

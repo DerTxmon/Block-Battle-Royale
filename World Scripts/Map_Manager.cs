@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Experimental.Rendering.Universal;
+
 public class Map_Manager : MonoBehaviour
 {
     public int Playercount;
@@ -63,17 +63,17 @@ public class Map_Manager : MonoBehaviour
     private IEnumerator WorldTime(){
         while(true){
             //Es wird Nacht
-            while(GlobalLight.GetComponent<Light2D>().intensity > .15f){
-                GlobalLight.GetComponent<Light2D>().intensity -= .0075f;
+            while(GlobalLight.GetComponent<UnityEngine.Rendering.Universal.Light2D>().intensity > .15f){
+                GlobalLight.GetComponent<UnityEngine.Rendering.Universal.Light2D>().intensity -= .0075f * Time.deltaTime;
                 //Mach Lichter AN wenn Abend (.5f) erreicht wird
-                if(GlobalLight.GetComponent<Light2D>().intensity < .5f) TurnOnLights();
+                if(GlobalLight.GetComponent<UnityEngine.Rendering.Universal.Light2D>().intensity < .5f) TurnOnLights();
                 yield return new WaitForSeconds(Timespeed);
             }
             //Es wird Tag
-            while(GlobalLight.GetComponent<Light2D>().intensity < .9f){
-                GlobalLight.GetComponent<Light2D>().intensity += .015f;
+            while(GlobalLight.GetComponent<UnityEngine.Rendering.Universal.Light2D>().intensity < .9f){
+                GlobalLight.GetComponent<UnityEngine.Rendering.Universal.Light2D>().intensity += .015f * Time.deltaTime;
                 //Mach Lichter AUS wenn Abend (.5f) erreicht wird
-                if(GlobalLight.GetComponent<Light2D>().intensity > .5f) TurnOffLights();
+                if(GlobalLight.GetComponent<UnityEngine.Rendering.Universal.Light2D>().intensity > .5f) TurnOffLights();
                 yield return new WaitForSeconds(Timespeed);
             }
         }
@@ -81,13 +81,13 @@ public class Map_Manager : MonoBehaviour
 
     private void TurnOnLights(){
         foreach(GameObject i in Laternen){
-            i.GetComponentInChildren<Light2D>().enabled = true;
+            i.GetComponentInChildren<UnityEngine.Rendering.Universal.Light2D>().enabled = true;
         }
     }
 
     private void TurnOffLights(){
         foreach(GameObject i in Laternen){
-            i.GetComponentInChildren<Light2D>().enabled = false;
+            i.GetComponentInChildren<UnityEngine.Rendering.Universal.Light2D>().enabled = false;
         }
     }
 
@@ -114,7 +114,7 @@ public class Map_Manager : MonoBehaviour
     }
 
     public void  Win(){
-        StartCoroutine(Player.GetComponent<UI_Handler>().EndScreen());
+        StartCoroutine(Player.GetComponent<UI_Handler>().EndScreen(true));
     }
 
     private void SpawnItems(){

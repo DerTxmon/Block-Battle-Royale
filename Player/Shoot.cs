@@ -9,7 +9,7 @@ public class Shoot : MonoBehaviour
     [SerializeField] private GameObject Player;
     public GameObject Bullet;
     public GameObject Feuerpunkt; 
-    public bool isshooting;
+    public bool isshooting, ishitting;
     public bool shootbttn = false;
     public bool reloadbttn = false;
     public bool inreload, autoshootbttn = false;
@@ -19,6 +19,7 @@ public class Shoot : MonoBehaviour
     public LayerMask layerMask;
     private Color impactobjectcolor;
     public static int Damage_dealt;
+    public Animator animator;
 
     // Start is called before the first frame update
     void Start()
@@ -38,9 +39,48 @@ public class Shoot : MonoBehaviour
             StartCoroutine(reload());
         }
     }
+    private IEnumerator Hit(){
+        if(!isshooting && !ishitting){
+            ishitting = true;
+            //Play Animation
+            animator.SetBool("ishitting", true);
+            //Raycast schuss
+            RaycastHit2D hitinfo = Physics2D.Raycast(transform.position, transform.up, 1.5f, layerMask); //Glock schießt 50f weit
+            if(hitinfo){
+                if(hitinfo.collider.gameObject.tag == "Player"){
+                    hitinfo.collider.GetComponent<Player_Health>().Damage(17);
+                    Damage_dealt += 17;
+                }else if(hitinfo.collider.gameObject.tag == "Bot"){
+                    if(hitinfo.collider.GetComponent<Bot_Health>().health <= 17) gameObject.GetComponent<Inventory_Handler>().Kills++;
+                    hitinfo.collider.GetComponent<Bot_Health>().Damage(17);
+                    Damage_dealt += 17;
+                }
+                
+                //Einschuss Animation (Blut)
+                if(hitinfo.collider.gameObject.tag == "Player" || hitinfo.collider.gameObject.tag == "Bot"){
+                    Color impactobjectcolor = Color.red;
+                    GameObject animation = Instantiate(Impactanimation, hitinfo.point, Quaternion.identity);
+                    ParticleSystem.MainModule main = animation.GetComponent<ParticleSystem>().main;
+                    main.startColor = impactobjectcolor;
+                }else{ //Die Farbe des getroffenem Object wird genommen und eine alternative Inpact Animation wird mit der farbe des objects abgespielt 
+                    int randint = Random.Range(1,3);//Es wird Random eine Farbe zwischen Grau und Braun gewählt und als Animations Farbe genutzt
+                    if(randint == 1)impactobjectcolor = Color.gray; //Graue Farbe
+                    else ColorUtility.TryParseHtmlString("#985000", out impactobjectcolor); //Braune Farbe
+                    GameObject animation = Instantiate(Impactanimation, hitinfo.point, Quaternion.identity);
+                    ParticleSystem.MainModule main = animation.GetComponent<ParticleSystem>().main;
+                    main.startColor = impactobjectcolor;
+                }
+            }
+            //Wait
+            yield return new WaitForSeconds(0.5f);
+            animator.SetBool("ishitting", false);
+            ishitting = false;
+        }
+    }
 
-     IEnumerator shoot(){
+    private IEnumerator shoot(){
         if(Inv.Slot1_Selected == true){
+        if(Inv.Slot1_Item == "" || Inv.Slot1_Item == null && !ishitting && !isshooting) StartCoroutine(Hit());
         //Glock-18
         if(Inv.Glock_18_Selected == true && isshooting == false && Inv.slot1_mag_ammo > 0){
             isshooting = true;
@@ -291,6 +331,7 @@ public class Shoot : MonoBehaviour
     }
 
     if(Inv.Slot2_Selected == true){
+        if(Inv.Slot2_Item == "" || Inv.Slot2_Item == null && !ishitting && !isshooting) StartCoroutine(Hit());
          //Glock-18
         if(Inv.Glock_18_Selected == true && isshooting == false && Inv.slot2_mag_ammo > 0){
             isshooting = true;
@@ -539,6 +580,7 @@ public class Shoot : MonoBehaviour
     }
 
     if(Inv.Slot3_Selected == true){
+        if(Inv.Slot3_Item == "" || Inv.Slot3_Item == null && !ishitting && !isshooting) StartCoroutine(Hit());
          //Glock-18
         if(Inv.Glock_18_Selected == true && isshooting == false && Inv.slot3_mag_ammo > 0){
             isshooting = true;
@@ -786,12 +828,7 @@ public class Shoot : MonoBehaviour
         }
     }
 }
-    
-
-
-
-
-    
+        
     //Shootbutton variablen
     public void shootbutton(){
         shootbttn = true;

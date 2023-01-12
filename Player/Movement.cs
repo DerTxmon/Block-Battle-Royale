@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
-using UnityEngine.Rendering.Universal;
+using UnityEngine.U2D.Animation;
+using System;
 
 public class Movement : MonoBehaviour
 {
@@ -34,17 +35,46 @@ public class Movement : MonoBehaviour
     public string Player_Name_Ingame;
     public GameObject Name_Text;
     public GameObject PostProcessingVolume, Wald;
+    public SpriteLibraryAsset DefaultSkinLibrary, AgentSkinLibrary, BetaSkinLibrary, ClownSkinLibrary, AlienSkinLibrary, OttoSkinLibrary, ChrisSkinLibrary;
+    private GameObject Joystick1handle;
 
     void Awake(){
         //Performance Settings from Menu
         if(Menu_Handler.performancemode == false){
             //-Low Performance settings-
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 30;
             //Disable Post Processing
             PostProcessingVolume.SetActive(false);
         }else{
+            //-High Performance settings-
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 999;
+
             PostProcessingVolume.SetActive(true);
         }
         //Setz den Player auf die im Dropoff Screen angegebene Position
+        //Skin Laden
+        LoadPlayerSkin();
+        Joystick1handle = joystick1.transform.Find("Handle").gameObject;
+    }
+
+    public void LoadPlayerSkin(){
+        if(Menu_Handler.loadeddata.SelectedSkin == "Default"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = DefaultSkinLibrary;
+        }else if(Menu_Handler.loadeddata.SelectedSkin == "Beta"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = BetaSkinLibrary;
+        }else if(Menu_Handler.loadeddata.SelectedSkin == "Alien"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = AlienSkinLibrary;
+        }else if(Menu_Handler.loadeddata.SelectedSkin == "Clown"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = ClownSkinLibrary;
+        }else if(Menu_Handler.loadeddata.SelectedSkin == "Otto"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = OttoSkinLibrary;
+        }else if(Menu_Handler.loadeddata.SelectedSkin == "Chris"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = ChrisSkinLibrary;
+        }else if(Menu_Handler.loadeddata.SelectedSkin == "Agent"){
+            Player.GetComponent<SpriteLibrary>().spriteLibraryAsset = AgentSkinLibrary;
+        }
     }
 
     // Start is called before the first frame update
@@ -52,7 +82,7 @@ public class Movement : MonoBehaviour
     {
         if(Dropoff_Handler.DropoffX != 0 || Dropoff_Handler.DropoffY != 0) Player.transform.position = new Vector3(Dropoff_Handler.DropoffX, Dropoff_Handler.DropoffY, 100f);//if statement nur für in editor bequemlichkeit
         Debug.Log(Dropoff_Handler.DropoffX);
-        Player_Name_Ingame = Menu_Handler.Player_Name;
+        //Player_Name_Ingame = Menu_Handler.Player_Name;
         Name_Text.GetComponent<TextMeshPro>().text = Player_Name_Ingame;
         World = GameObject.Find("World");
         rb = GetComponent<Rigidbody2D>();
@@ -77,12 +107,16 @@ public class Movement : MonoBehaviour
 
         transform.Translate(movementDir, Space.World);
 
-        
         if(transform.position != lastpos){
             animatior.SetBool("isrunning", true);
+            //Animation speed
+            float animspeed;
+            animspeed = ((Vector2.Distance(Joystick1handle.transform.position, joystick1.transform.position)) / 2.37f) * 1.5f; //distanz vom halde vom center berechnen(max ist 2.37 um also auf eine range von 0-1 zu kommen teilen wir durch max)
+            animatior.SetFloat("runspeed", animspeed);
             steping = true;
         }else{
             animatior.SetBool("isrunning", false);
+            animatior.SetFloat("runspeed", 1f);
             steping = false;
         }
         lastpos = transform.position;
