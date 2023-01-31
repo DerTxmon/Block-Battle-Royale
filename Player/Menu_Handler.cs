@@ -6,18 +6,18 @@ using UnityEngine.SceneManagement;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using UnityEngine.Advertisements;
+using System.Net.NetworkInformation;
 using TMPro;
 
 public class Menu_Handler : MonoBehaviour
 {
     public GameObject Player, Shop_Button, Play_Button, Friends_Button, Inv_Button, Coin_Counter, Emerald_Counter, Player_Name_Button, Name_Input, BG1, BG2, BG3, BG4, ShopBG, Logo, Settings_Button, Settings_BG, Settings_Menu, Settings_Menu_X, AddBotButton, RemoveBotButton, Bot_Display;
     public GameObject LobbyMusic, Settings_X;
-    public Text Coin_Count, Emerald_Count, Player_Name_Text, Bot_Counter;
+    public TextMeshProUGUI Coin_Count, Emerald_Count, Player_Name_Text;// Bot_Counter;
     public GameObject[] BGPoints;
     public int Coins; //Muss noch Automatisch gezählt werden wird aber vorerst auf 123 Gesetzt
     public static string Player_Name = "Player";
-    public static int Menu_Bots = 20;
+    public static int Menu_Bots = 19; //19 Bots werden an Map Handler gesendet damit auf der Map später 20 Man stehen
     public float CAMSPEED = 0.001f;
     public float Playerspinspeed;
     public static bool performancemode = true;
@@ -27,7 +27,8 @@ public class Menu_Handler : MonoBehaviour
     private GameObject activeBG;
     public GameObject RewardWindowPrefab;
     public RectTransform RewardWindowPos;
-    private string[] sonderzeichen = {"!","§","$","%","&","/","(",")","=","?","}","]","[","{","³","²","^","°","<",">","|","+","*","~",",",":",";","-","_","\u00b4" /*´*/,"`", "'\u0022'"/*backslash*/};
+    public GameObject MusicSlider;
+    private string[] sonderzeichen = {"\""/*escaped ->"<-*/,"!","§", "'","$","%","&","/","(",")","=","?","}","]","[","{","³","²","^","°","<",">","|","+","*","~",",",":",";","-","_","\u00b4" /*´*/,"`", "'\u0022'"/*backslash*/};
     //Skins
     [SerializeField] private Sprite DefaultSkinSprite, BetaSkinSprite, AgentSkinSprite, OttoSkinSprite, ClownSkinSprite, AlienSkinSprite, ChrisSkinSprite;
     public GameObject Menu_Skin_Display;
@@ -52,10 +53,10 @@ public class Menu_Handler : MonoBehaviour
     public GameObject X_Inv;
 
     //Level
-    [SerializeField] private Text Leveltext;
+    [SerializeField] private TextMeshProUGUI Leveltext;
     [SerializeField] private Image ProgressBar;
     [SerializeField] private Image ProgressBarBG;
-    [SerializeField] private Text neededXP;
+    [SerializeField] private TextMeshProUGUI neededXP;
 
     //Friends, Online
     [SerializeField] private GameObject onlineBG;
@@ -119,8 +120,15 @@ public class Menu_Handler : MonoBehaviour
     private static Menu_Handler instance;
     private GameObject RewardWindowObject;
     public static int x;
+    //Loading Screen
+    [SerializeField] private GameObject BBRLogo_LoadingScreen;
+    [SerializeField] public GameObject PlayerModel_LoadingScreen;
+    public static Sprite PlayerModel_LoadingScreen_Image;
 
     void Awake(){
+        //Immer im Menü volle leistung
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 999;
         instance = this;
         //50 50 ob Ad Button erscheint
         int randnum = UnityEngine.Random.Range(0, 2);
@@ -140,18 +148,22 @@ public class Menu_Handler : MonoBehaviour
     }
 
     void Start(){
+        //FPS auf 120 schalten
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 120;
         try{
             Readdata(); //Versuche Spieler daten zu lesen und wenn keine da sind
 
             //Set Saved Player name
-            Player_Name_Text.GetComponent<Text>().text = loadeddata.Saved_Player_Name;
+            Player_Name_Text.text = loadeddata.Saved_Player_Name;
             //Set Saved Coins to display
-            Coin_Count.GetComponent<Text>().text = loadeddata.Saved_Coins.ToString();
-            Emerald_Count.GetComponent<Text>().text = loadeddata.Saved_Emeralds.ToString();
+            Coin_Count.text = loadeddata.Saved_Coins.ToString();
+            Emerald_Count.text = loadeddata.Saved_Emeralds.ToString();
             //Setz die anzeige sofort auf 1
-            Bot_Counter.text = Menu_Bots.ToString();
+            //Bot_Counter.text = Menu_Bots.ToString();
             InitSkinButtons();
             InitLevel();
+            ApplySettings();
         }catch{
             StartCoroutine(InitUserData()); //Erstelle neue Spielerdaten und lese sie sofort
         }
@@ -199,15 +211,23 @@ public class Menu_Handler : MonoBehaviour
         Readdata();
         localdata = loadeddata;
         //Set Saved Player name
-        Player_Name_Text.GetComponent<Text>().text = loadeddata.Saved_Player_Name;
+        Player_Name_Text.text = loadeddata.Saved_Player_Name;
         //Set Saved Coins to display
-        Coin_Count.GetComponent<Text>().text = loadeddata.Saved_Coins.ToString();
-        Emerald_Count.GetComponent<Text>().text = loadeddata.Saved_Emeralds.ToString();
+        Coin_Count.text = loadeddata.Saved_Coins.ToString();
+        Emerald_Count.text = loadeddata.Saved_Emeralds.ToString();
         //Setz die anzeige sofort auf 1
-        Bot_Counter.text = Menu_Bots.ToString();
+        //Bot_Counter.text = Menu_Bots.ToString();
         InitSkinButtons();
         InitLevel();
+        ApplySettings();
         yield return null;
+    }
+
+    void ApplySettings(){ //Wende einmal alle gespeicherten Einstellungen an
+        //Menu Music
+        LobbyMusic.GetComponent<AudioSource>().volume = loadeddata.Menu_Music_Volume;
+        //Music Slider
+        MusicSlider.GetComponent<Slider>().value = loadeddata.Menu_Music_Volume;
     }
 
     //User Saved Data Object
@@ -234,6 +254,7 @@ public class Menu_Handler : MonoBehaviour
         public int PlayerID = 0; //Web Server teilt einmalig zu und wird ab dann nur noch gelesen.
         public string joinedversion;
         public int[] FriendsIDs = new int[6]; //Wird bei aufrufen der Freunde einmal durchgelooped
+        public float Menu_Music_Volume = .5f;
     }
 
     public void InitLevel(){
@@ -267,7 +288,7 @@ public class Menu_Handler : MonoBehaviour
         localdata = loadeddata;
         localdata.Saved_Emeralds += ammount;
         //Display
-        GameObject.Find("Emerald Counter").transform.Find("Counter").GetComponent<Text>().text = localdata.Saved_Emeralds.ToString(); //Muss so gesucht werden methode statisch ist
+        GameObject.Find("Emerald Counter").transform.Find("Counter").GetComponent<TextMeshProUGUI>().text = localdata.Saved_Emeralds.ToString(); //Muss so gesucht werden methode statisch ist
         Writedata(localdata);
         yield return new WaitForEndOfFrame();
         Readdata();
@@ -278,7 +299,7 @@ public class Menu_Handler : MonoBehaviour
         localdata = loadeddata;
         localdata.Saved_Coins += ammount;
         //Display
-        GameObject.Find("Coin Counter").transform.Find("Counter").GetComponent<Text>().text = localdata.Saved_Coins.ToString(); //Muss so gesucht werden methode statisch ist
+        GameObject.Find("Coin Counter").transform.Find("Counter").GetComponent<TextMeshProUGUI>().text = localdata.Saved_Coins.ToString(); //Muss so gesucht werden methode statisch ist
         Writedata(localdata);
         yield return new WaitForEndOfFrame();
         Readdata();
@@ -469,6 +490,7 @@ public class Menu_Handler : MonoBehaviour
             if(AdCounter % 2 == 0){ //Wenn der AdCounter gerade ist, dann zeige den Ad Button an
                 if(Watchedads < 2){
                     //Zufall ob Emerald oder Coin
+                    x = UnityEngine.Random.Range(0,10);
                     if(x == 5){
                         //Zeige den Emerald Ad Button
                         instance.AdButton.GetComponent<Image>().sprite = instance.EmeraldAdButtonSprite;
@@ -517,13 +539,39 @@ public class Menu_Handler : MonoBehaviour
             yield return new WaitForSeconds(5f);
         }
     }
+    public static bool PingHost(string nameOrAddress){
+        bool pingable = false;
+        System.Net.NetworkInformation.Ping pinger = null; //Inspiriert von https://stackoverflow.com/questions/11800958/using-ping-in-c-sharp
+        try{
+            pinger = new System.Net.NetworkInformation.Ping();
+            PingReply reply = pinger.Send(nameOrAddress);
+            pingable = reply.Status == IPStatus.Success;
+        }
+        catch (PingException){
+            // Discard PingExceptions and return false;
+        }
+        finally{
+            if (pinger != null)
+            {
+                pinger.Dispose();
+            }
+        }
+        return pingable;
+    }
     public void FriendButtonMenu(){
-        if(Application.internetReachability != NetworkReachability.NotReachable){
-            StartCoroutine(FriendsWindowCR());
+        /*if(Application.internetReachability != NetworkReachability.NotReachable){
+            //Schau ob der Server auch erreicht werden kann mit einem Ping
+            if(PingHost("192.168.0.187")){
+                LoadingText.GetComponent<Text>().text = "Loading...";
+                StartCoroutine(FriendsWindowCR()); //Fetch Friends from Server
+            }else{
+                LoadingText.GetComponent<Text>().text = "Cant reach Server";
+            }
         }else{//Mach den Button Grau
             Friends_Button.GetComponent<Image>().sprite = FriendsButtonSpriteNoConnection;
             Friends_Button.GetComponent<Button>().interactable = false;
-        }
+        }*/
+        StartCoroutine(FriendsWindowCR()); //Fetch Friends from Server
     }
     public IEnumerator FriendsWindowCR(){
         //Deactivate Hud
@@ -724,9 +772,6 @@ public class Menu_Handler : MonoBehaviour
         LoadingText.SetActive(false);
         GlobalLeaderboardScroll.SetActive(true);
         yield return null;
-    }
-    public void RankLeaderboardButtonFunc(){
-
     }
     public IEnumerator InitUserData3(){
         Writedata(localdata);
@@ -1090,8 +1135,8 @@ public class Menu_Handler : MonoBehaviour
         ProgressBar.gameObject.SetActive(false);
         ProgressBarBG.gameObject.SetActive(false);
         neededXP.gameObject.SetActive(false);
-        instance.AdButton.gameObject.GetComponent<Image>().enabled = true;
-        instance.AdButton.gameObject.GetComponent<Button>().enabled = true;
+        instance.AdButton.gameObject.GetComponent<Image>().enabled = false;
+        instance.AdButton.gameObject.GetComponent<Button>().enabled = false;
 
         Name_Input.SetActive(true); //Input Field
     }
@@ -1112,6 +1157,8 @@ public class Menu_Handler : MonoBehaviour
         ProgressBar.gameObject.SetActive(true);
         ProgressBarBG.gameObject.SetActive(true);
         neededXP.gameObject.SetActive(true);
+        instance.AdButton.gameObject.GetComponent<Image>().enabled = true;
+        instance.AdButton.gameObject.GetComponent<Button>().enabled = true;
 
         Name_Input.SetActive(false); //Input Field
 
@@ -1124,6 +1171,7 @@ public class Menu_Handler : MonoBehaviour
                 if(Nick.Contains(i)){
                     y = 1; //blocks if statement
                     //throw window with notifitation
+                    Debug.Log("Sonderzeichen nicht erlaubt");
                 }
             }
             if(y == 0){
@@ -1135,12 +1183,12 @@ public class Menu_Handler : MonoBehaviour
     }
 
     public void Refresh_CoinCounter(){
-        Coin_Count.GetComponent<Text>().text = localdata.Saved_Coins.ToString();
+        Coin_Count.text = localdata.Saved_Coins.ToString();
         Writedata(localdata);
     }
 
     public void Refresh_PlayerName(){
-        Player_Name_Text.GetComponent<Text>().text = Player_Name;
+        Player_Name_Text.text = Player_Name;
         //Write to save variable
         localdata = loadeddata;
         localdata.Saved_Player_Name = Player_Name; //Neuer Name
@@ -1149,17 +1197,54 @@ public class Menu_Handler : MonoBehaviour
 
     public void StartGame(){
         //Load the Game
-        SceneManager.LoadScene(sceneName:"Dropoff");
+        StartCoroutine(LoadGame());
+    }
+    public IEnumerator LoadGame(){
+        //Blend langsam den Black screen ein und lad dann die scene
+        //Gib dem Loadingscreen Player model den Skin den der player gerade spielt
+        PlayerModel_LoadingScreen.GetComponent<Image>().sprite = Player.GetComponent<Image>().sprite;
+        PlayerModel_LoadingScreen_Image = PlayerModel_LoadingScreen.GetComponent<Image>().sprite; //Für den Ingame Black screen
+        Black.gameObject.SetActive(true); //muss vorher aus sein und dann aktiviert werden weil er sonst über allem liegt
+        //Black Color Cache
+        float Bcolorr = Black.color.r;
+        float Bcolorg = Black.color.g;
+        float Bcolorb = Black.color.b;
+        //BBRLogo Color Cache
+        Image BBRLogo_LoadingScreenImage = BBRLogo_LoadingScreen.GetComponent<Image>();
+        float BBRColorR = BBRLogo_LoadingScreen.GetComponent<Image>().color.r;
+        float BBRColorG = BBRLogo_LoadingScreen.GetComponent<Image>().color.g;
+        float BBRColorB = BBRLogo_LoadingScreen.GetComponent<Image>().color.b;
+        //PlayerModel Color Cache
+        Image PlayerModel_LoadingScreenImage = PlayerModel_LoadingScreen.GetComponent<Image>();
+        float PlayerLoadingColorR = PlayerModel_LoadingScreen.GetComponent<Image>().color.r;
+        float PlayerLoadingColorG = PlayerModel_LoadingScreen.GetComponent<Image>().color.g;
+        float PlayerLoadingColorB = PlayerModel_LoadingScreen.GetComponent<Image>().color.b;
+        //RectTransform Cache
+        RectTransform BBRLogoTrans = BBRLogo_LoadingScreen.GetComponent<RectTransform>();
+        float BBRLogoTransY = BBRLogoTrans.localPosition.y; //X und Z bleiben gleich also in den Cache schreiben
+        float BBRLogoTransZ = BBRLogoTrans.localPosition.z;
+        RectTransform PlayerModelTrans = PlayerModel_LoadingScreen.GetComponent<RectTransform>();
+        float PlayerModelY = PlayerModelTrans.localPosition.y; 
+        float PlayerModelZ = PlayerModelTrans.localPosition.z;
+        for(int i = 0; i < 90; i++){
+            Black.color = new Color(Bcolorr,Bcolorg,Bcolorb,Black.color.a + 0.0111111111111111f); //Blendet das schwarz,Logo und Player in 90 schritten ein weil 90 x 0.0111111111111111f = 1;
+            BBRLogo_LoadingScreenImage.color = new Color(BBRColorR, BBRColorG, BBRColorB, BBRLogo_LoadingScreenImage.color.a + 0.0111111111111111f);
+            PlayerModel_LoadingScreenImage.color = new Color(PlayerLoadingColorR, PlayerLoadingColorG, PlayerLoadingColorB, PlayerModel_LoadingScreenImage.color.a + 0.0111111111111111f);
+            BBRLogoTrans.localPosition = new Vector3(BBRLogoTrans.localPosition.x - 15.66666666666667f, BBRLogoTransY, BBRLogoTransZ); //Logo und Player wird in die Mite geschoben
+            PlayerModelTrans.localPosition = new Vector3(PlayerModelTrans.localPosition.x + 11.68888888888889f, PlayerModelY, PlayerModelZ);
+            yield return new WaitForEndOfFrame();
+        }
+        SceneManager.LoadSceneAsync(sceneName:"Game");
     }
 
     public void AddBot(){
         if(Menu_Bots < 20)Menu_Bots += 1;
-        Bot_Counter.text = Menu_Bots.ToString();
+        //Bot_Counter.text = Menu_Bots.ToString();
     }
 
     public void RemoveBot(){
         if(Menu_Bots > 0) Menu_Bots -= 1;
-        Bot_Counter.text = Menu_Bots.ToString();
+        //Bot_Counter.text = Menu_Bots.ToString();
     }
     public void Settings(){
         Player.SetActive(false); //Deaktiviere das Ganze Menü und mache nur die Settings sichtbar
@@ -1175,6 +1260,10 @@ public class Menu_Handler : MonoBehaviour
         Name_Input.SetActive(false);
         Settings_Button.gameObject.SetActive(false);
         AdButton.SetActive(false);
+        AdButton.GetComponent<Image>().enabled = false;
+        AdButton.GetComponent<Button>().enabled = false;
+        ProgressBar.gameObject.SetActive(false);
+        ProgressBarBG.gameObject.SetActive(false);
 
         Settings_Menu_X.gameObject.SetActive(true);
         Settings_Menu.gameObject.SetActive(true);
@@ -1221,19 +1310,25 @@ public class Menu_Handler : MonoBehaviour
         GlobalLeaderboardButton.SetActive(false);
         AddFriendInput.SetActive(false);
         GlobalLeaderboardScroll.SetActive(false);
+        LoadingText.SetActive(false);
         //und Shop
         ShopScroll.SetActive(false);
         ShopBG.SetActive(false);
         X_Shop.SetActive(false);
         Skin_i.SetActive(false);
         SkinInfoTafel.SetActive(false);
+        AdButton.GetComponent<Image>().enabled = true;
+        AdButton.GetComponent<Button>().enabled = true;
     }
 
     public void MusicSettingChanged(float newVolume){
         //Auf die neue Lautstärke aktualisieren
         LobbyMusic.GetComponent<AudioSource>().volume = newVolume;
+        //und in die Daten speichern
+        localdata = loadeddata;
+        localdata.Menu_Music_Volume = newVolume;
+        Writedata(localdata);
         //Music in Prozent im Menü anzeigen
-        
     }
 
     public void Refresh_Menu_Skin(){
@@ -1365,7 +1460,7 @@ public class Menu_Handler : MonoBehaviour
         }
         else if(loadeddata.SelectedSkin == "Clown"){
             ClownSkinButton.sprite = ClownSkinButtonGreen;
-            Menu_Skin_Display.GetComponent<Image>().sprite =   ClownDisplayModel;
+            Menu_Skin_Display.GetComponent<Image>().sprite = ClownDisplayModel;
         } 
         else if(loadeddata.SelectedSkin == "Otto"){
             OttoSkinButton.sprite = OttoSkinButtonGreen;
@@ -1378,6 +1473,6 @@ public class Menu_Handler : MonoBehaviour
         else if(loadeddata.SelectedSkin == "Alien"){
             AlienSkinButton.sprite = AlienSkinButtonGreen;
             Menu_Skin_Display.GetComponent<Image>().sprite = AlienDisplayModel;
-        } 
+        }
     }
 }

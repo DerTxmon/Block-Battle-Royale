@@ -20,10 +20,16 @@ public class Bot_Inventory : MonoBehaviour
     public GameObject Bot;
     public GameObject Glock_18_Top_Sprite, Ak47_Top_Sprite, M4_Top_Sprite, Sniper_Top_Sprite;
     
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+    void Awake(){
+        int rand = Random.Range(0, 3);
+        if(rand == 1){ // 33% chance
+            Slot1 = true;
+            Slot1_Item = "Glock_18"; //Bot bekommt zum Start eine Glock
+            slot1_mag_ammo = 20;
+            Slot1_Selected = true;
+            lootcount++;
+            lootcount2++;
+        } 
     }
 
     // Update is called once per frame

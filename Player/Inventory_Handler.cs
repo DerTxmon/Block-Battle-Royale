@@ -65,6 +65,8 @@ public class Inventory_Handler : MonoBehaviour
     public Image ShootbuttonSpriteObject;
     public Sprite ShootbuttonSprite;
     public Sprite HitbuttonSprite;
+    public Image Healthbar;
+    public Text HealthbarText;
 
     void Awake(){
         Small_Ammo_Reserve = GameObject.Find("Small Ammo Reserve").GetComponent<Text>();
@@ -646,9 +648,14 @@ public class Inventory_Handler : MonoBehaviour
 
     public void Slot4_function(){
         //Heal Funktion
-        if(Player_Heal > 0 && GameObject.Find("Player").GetComponent<Player_Health>().health < 200){
+        Player_Health playerhealth = Player.GetComponent<Player_Health>(); //Einmal in den Cache laden
+        if(Player_Heal > 0 && playerhealth.health < 200){
             Player_Heal2 -= 1;
-            GameObject.Find("Player").GetComponent<Player_Health>().health += 20;
+            playerhealth.health += 20;
+            if(playerhealth.health > 200) playerhealth.health = 200; //Prevent overheal
+            //Refresh UI
+            Healthbar.fillAmount = playerhealth.health / 200;
+            HealthbarText.text = playerhealth.health + "%";
         }
     }
 }

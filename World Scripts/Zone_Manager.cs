@@ -33,7 +33,7 @@ public class Zone_Manager : MonoBehaviour
         righttransform = GameObject.Find("zone_right").transform;
         bottomtransform = GameObject.Find("zone_bottom").transform;
 
-        SetZoneSize(new Vector3(0f,0f, -9.199997f), new Vector3(1344.96f,1344.96f, 0f));
+        SetZoneSize(new Vector3(0f,0f, -9.199997f), new Vector3(1153.6f,1153.6f, 0f));
     }
 
     void Update(){

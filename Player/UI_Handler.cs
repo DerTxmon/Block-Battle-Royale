@@ -28,7 +28,12 @@ public class UI_Handler : MonoBehaviour
     public GameObject World, DeathWinPoint;
     public Sprite WinIcon, DeathIcon;
     private int GiveXP;
-    void Awake() {
+    public Image LoadingScreen;
+    [SerializeField] private GameObject BBRLogo_LoadingScreen;
+    [SerializeField] private GameObject PlayerModel_LoadingScreen;
+    void Awake(){
+        //Start Musik Lautstärke
+        LoadingScreen.GetComponent<AudioSource>().volume = Menu_Handler.loadeddata.Menu_Music_Volume;
         foreach(GameObject i in HUD){
             if(i.GetComponent<SpriteRenderer>() != null){
                 HudComponents_Sprites.Add(i.gameObject.GetComponent<SpriteRenderer>()); //Nimmt jedes GameObject aus dem Hud und trägt den Color component in eine liste ein um beim tod das hud langsam aus zublenden
@@ -37,7 +42,9 @@ public class UI_Handler : MonoBehaviour
             }else if(i.GetComponent<Text>() != null){
                 HudComponents_Text.Add(i.gameObject.GetComponent<Text>());
             }
-        }   
+        }
+        //Blend LoadingScreenscreen aus
+        StartCoroutine(LoadingScreenFadeout());
     }
     public void Start(){
        //AllrenderableGameObjects = FindObjectsOfType<Render_Manager>().Select(rm => rm.gameObject).ToArray();
@@ -49,6 +56,43 @@ public class UI_Handler : MonoBehaviour
         float PointX = transform.position.x / 7f; //Aktuelle Position durch Differenz zur minimap in real world to UI Verhältniss
         float PointY = transform.position.y / 7f;
         Point.GetComponent<RectTransform>().localPosition = new Vector3(PointX, PointY, 0f);
+    }
+
+    public IEnumerator LoadingScreenFadeout(){
+        //Player Model Skin Geben
+        PlayerModel_LoadingScreen.GetComponent<Image>().sprite = Menu_Handler.PlayerModel_LoadingScreen_Image;
+        //Blend langsam den LoadingScreen screen ein und lad dann die scene
+        //LoadingScreen Color Cache
+        LoadingScreen.gameObject.SetActive(true); //muss vorher aus sein und dann aktiviert werden weil er sonst über allem liegt
+        float Bcolorr = LoadingScreen.color.r;
+        float Bcolorg = LoadingScreen.color.g;
+        float Bcolorb = LoadingScreen.color.b;
+        //BBRLogo Color Cache
+        Image BBRLogo_LoadingScreenImage = BBRLogo_LoadingScreen.GetComponent<Image>();
+        float BBRColorR = BBRLogo_LoadingScreen.GetComponent<Image>().color.r;
+        float BBRColorG = BBRLogo_LoadingScreen.GetComponent<Image>().color.g;
+        float BBRColorB = BBRLogo_LoadingScreen.GetComponent<Image>().color.b;
+        //PlayerModel Color Cache
+        Image PlayerModel_LoadingScreenImage = PlayerModel_LoadingScreen.GetComponent<Image>();
+        float PlayerLoadingColorR = PlayerModel_LoadingScreen.GetComponent<Image>().color.r;
+        float PlayerLoadingColorG = PlayerModel_LoadingScreen.GetComponent<Image>().color.g;
+        float PlayerLoadingColorB = PlayerModel_LoadingScreen.GetComponent<Image>().color.b;
+        //RectTransfrorm Cache
+        RectTransform BBRLogoTrans = BBRLogo_LoadingScreen.GetComponent<RectTransform>();
+        float BBRLogoTransY = BBRLogoTrans.localPosition.y; //X und Z bleiben gleich also in den Cache schreiben
+        float BBRLogoTransZ = BBRLogoTrans.localPosition.z;
+        RectTransform PlayerModelTrans = PlayerModel_LoadingScreen.GetComponent<RectTransform>();
+        float PlayerModelY = PlayerModelTrans.localPosition.y; 
+        float PlayerModelZ = PlayerModelTrans.localPosition.z;
+        for(int i = 0; i < 90; i++){
+            LoadingScreen.color = new Color(Bcolorr,Bcolorg,Bcolorb,LoadingScreen.color.a - 0.0111111111111111f); //Blendet das schwarz in 90 schritten aus weil 90 x 0.0111111111111111f = 1;
+            BBRLogo_LoadingScreenImage.color = new Color(BBRColorR, BBRColorG, BBRColorB, BBRLogo_LoadingScreenImage.color.a - 0.0111111111111111f);
+            PlayerModel_LoadingScreenImage.color = new Color(PlayerLoadingColorR, PlayerLoadingColorG, PlayerLoadingColorB, PlayerModel_LoadingScreenImage.color.a - 0.0111111111111111f);
+            BBRLogoTrans.localPosition = new Vector3(BBRLogoTrans.localPosition.x - 15.66666666666667f, BBRLogoTransY, BBRLogoTransZ); //Logo und Player wird in die Mite geschoben
+            PlayerModelTrans.localPosition = new Vector3(PlayerModelTrans.localPosition.x + 11.68888888888889f, PlayerModelY, PlayerModelZ);
+            yield return new WaitForEndOfFrame();
+        }
+        //LoadingScreen.gameObject.SetActive(false);
     }
 
     public void Mapbutton(){

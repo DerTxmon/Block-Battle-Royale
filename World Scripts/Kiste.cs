@@ -8,7 +8,7 @@ public class Kiste : MonoBehaviour
     public GameObject Kisteobj;
     private Kiste_Check KisteCheck;
     public bool isopen;
-    public GameObject Sniper, M4, Glock, Ak47, Small_Ammo, Mid_Ammo, Big_Ammo;
+    public GameObject Sniper, M4, Glock, Ak47, Small_Ammo, Mid_Ammo, Big_Ammo, Heal;
     private float Kiste_x_range1, Kiste_x_range2, Kiste_y_range1, Kiste_y_range2;
 
     // Start is called before the first frame update
@@ -72,6 +72,11 @@ public class Kiste : MonoBehaviour
                 }
                 yield return new WaitForSeconds(0.01f);
             }
+            //Heal Spawnen
+            int healnum =  Random.Range(0, 4);
+            if(healnum == 3){ //Kleine Prozent Chance das Heal gespawned wird
+                Instantiate(Heal,  new Vector3(Kisteobj.transform.position.x + Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y - Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
+            }
         }else if(gameObject.name == "Kiste_Oben Variant(Clone)" || gameObject.name == "Kiste_Links Variant(Clone)"){
             //-------
             //Für Kiste Oben und Kiste Links
@@ -100,6 +105,11 @@ public class Kiste : MonoBehaviour
                     Instantiate(Big_Ammo,  new Vector3(Kisteobj.transform.position.x - Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y + Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
                 }
                 yield return new WaitForSeconds(0.01f);
+            }
+            //Heal Spawnen
+            int healnum =  Random.Range(0, 4);
+            if(healnum == 3){ //Kleine Prozent Chance das Heal gespawned wird
+                Instantiate(Heal,  new Vector3(Kisteobj.transform.position.x - Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y + Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
             }
         }
         
