@@ -11,6 +11,7 @@ public class OnlineManager : MonoBehaviour
     public static int NewID = 0;
     public static int FriendExistance;
     public static string[] Shopinfo = new string[10];
+    public static string URL = "http://192.168.0.187/BBR/BBR.php"; //IP Adresse des Servers
 
     private void Awake() {
         //init GlobalBest Array
@@ -29,7 +30,7 @@ public class OnlineManager : MonoBehaviour
         form.AddField("Kills", Menu_Handler.loadeddata.Kills);
         form.AddField("Level", Menu_Handler.loadeddata.Level);
         Debug.Log("Loaded Level:" + Menu_Handler.loadeddata.Level);
-        UnityWebRequest www = UnityWebRequest.Post("http://192.168.0.187/BBR/BBR.php", form); //Connect to Webserver
+        UnityWebRequest www = UnityWebRequest.Post(URL, form); //Connect to Webserver
         DownloadHandlerBuffer dh = new DownloadHandlerBuffer(); //neuer download buffer weil sonst bug
         www.downloadHandler = dh; //download buffer zuweisen
         yield return www.SendWebRequest(); //Warte bis Anfrage fertig ist.
@@ -47,7 +48,7 @@ public class OnlineManager : MonoBehaviour
         WWWForm form = new WWWForm();
         form.AddField("getuserdata", "1");
         form.AddField("id", id); //User Daten zum suchen in der Datenbank
-        UnityWebRequest www = UnityWebRequest.Post("http://192.168.0.187/BBR/BBR.php", form); //Connect to Webserver
+        UnityWebRequest www = UnityWebRequest.Post(URL, form); //Connect to Webserver
         DownloadHandlerBuffer dh = new DownloadHandlerBuffer(); //neuer download buffer weil sonst bug
         www.downloadHandler = dh; //download buffer zuweisen
         yield return www.SendWebRequest(); //Warte bis Anfrage fertig ist.
@@ -66,7 +67,7 @@ public class OnlineManager : MonoBehaviour
         WWWForm form = new WWWForm();
         form.AddField("checkforexistance", "1");
         form.AddField("id", id); //User Daten zum suchen in der Datenbank
-        UnityWebRequest www = UnityWebRequest.Post("http://192.168.0.187/BBR/BBR.php", form); //Connect to Webserver
+        UnityWebRequest www = UnityWebRequest.Post(URL, form); //Connect to Webserver
         DownloadHandlerBuffer dh = new DownloadHandlerBuffer(); //neuer download buffer weil sonst bug
         www.downloadHandler = dh; //download buffer zuweisen
         yield return www.SendWebRequest(); //Warte bis Anfrage fertig ist.
@@ -97,7 +98,7 @@ public class OnlineManager : MonoBehaviour
         form.AddField("Wins", Menu_Handler.loadeddata.Wins);
         form.AddField("Kills", Menu_Handler.loadeddata.Kills);
         form.AddField("Level", Menu_Handler.loadeddata.Level);
-        UnityWebRequest www = UnityWebRequest.Post("http://192.168.0.187/BBR/BBR.php", form); //Connect to Webserver
+        UnityWebRequest www = UnityWebRequest.Post(URL, form); //Connect to Webserver
         DownloadHandlerBuffer dh = new DownloadHandlerBuffer(); //neuer download buffer weil sonst bug
         www.downloadHandler = dh; //download buffer zuweisen
         yield return www.SendWebRequest(); //Warte bis Anfrage fertig ist.
@@ -109,7 +110,7 @@ public class OnlineManager : MonoBehaviour
         form.AddField("UpdateNickname","1");
         form.AddField("id", Menu_Handler.loadeddata.PlayerID);
         form.AddField("Nickname", Menu_Handler.loadeddata.Saved_Player_Name);
-        UnityWebRequest www = UnityWebRequest.Post("http://192.168.0.187/BBR/BBR.php", form); //Connect to Webserver
+        UnityWebRequest www = UnityWebRequest.Post(URL, form); //Connect to Webserver
         DownloadHandlerBuffer dh = new DownloadHandlerBuffer(); //neuer download buffer weil sonst bug
         www.downloadHandler = dh; //download buffer zuweisen
         yield return www.SendWebRequest(); //Warte bis Anfrage fertig ist.
@@ -131,7 +132,7 @@ public class OnlineManager : MonoBehaviour
         form.AddField("Kills", Menu_Handler.loadeddata.Kills);
         form.AddField("Level", Menu_Handler.loadeddata.Level);
         form.AddField("id", Menu_Handler.loadeddata.PlayerID);
-        UnityWebRequest www = UnityWebRequest.Post("http://192.168.0.187/BBR/BBR.php", form); //Connect to Webserver
+        UnityWebRequest www = UnityWebRequest.Post(URL, form); //Connect to Webserver
         yield return www.SendWebRequest(); //Warte bis Anfrage fertig ist.
         www.Dispose(); //Schieße die Connection damit C# keinen Memory leck erleided
     }
@@ -141,7 +142,7 @@ public class OnlineManager : MonoBehaviour
         form.AddField("updateselectedskin", "1");
         form.AddField("id", Menu_Handler.loadeddata.PlayerID);
         form.AddField("SelectedSkin", Menu_Handler.loadeddata.SelectedSkin);
-        UnityWebRequest www = UnityWebRequest.Post("http://192.168.0.187/BBR/BBR.php", form); //Connect to Webserver
+        UnityWebRequest www = UnityWebRequest.Post(URL, form); //Connect to Webserver
         yield return www.SendWebRequest(); //Warte bis Anfrage fertig ist.
         www.Dispose(); //Schieße die Connection damit C# keinen Memory leck erleided
     }
@@ -153,7 +154,7 @@ public class OnlineManager : MonoBehaviour
         //Daten Aktualisieren
         form.AddField("gettop", "1");
         form.AddField("id", Menu_Handler.loadeddata.PlayerID);
-        UnityWebRequest www = UnityWebRequest.Post("http://192.168.0.187/BBR/BBR.php", form); //Connect to Webserver
+        UnityWebRequest www = UnityWebRequest.Post(URL, form); //Connect to Webserver
         yield return www.SendWebRequest(); //Warte bis Anfrage fertig ist.
         if((www.result == UnityWebRequest.Result.ConnectionError)){ //schau ob error
             Debug.Log("SERVER CONNECTION ERROR");
@@ -175,7 +176,7 @@ public class OnlineManager : MonoBehaviour
         WWWForm form = new WWWForm();
         //Daten Aktualisieren
         form.AddField("getshopinfo", "1");
-        UnityWebRequest www = UnityWebRequest.Post("http://192.168.0.187/BBR/BBR.php", form); //Connect to Webserver
+        UnityWebRequest www = UnityWebRequest.Post(URL, form); //Connect to Webserver
         yield return www.SendWebRequest(); //Warte bis Anfrage fertig ist.
         if((www.result == UnityWebRequest.Result.ConnectionError)){ //schau ob error
             Debug.Log("SERVER CONNECTION ERROR");

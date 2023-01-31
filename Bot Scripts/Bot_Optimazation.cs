@@ -55,7 +55,7 @@ public class Bot_Optimazation : MonoBehaviour
                 }
             }
             //Player
-            if(Vector2.Distance(Player.transform.position, this.gameObject.transform.position) < 70f){
+            if(Vector2.Distance(Player.transform.position, this.gameObject.transform.position) < 75f){
                 is_object_in_range = true;
                 goto end;
             }else{
@@ -113,7 +113,6 @@ public class Bot_Optimazation : MonoBehaviour
                         is_object_in_range = false;
                     }
                 }
-                
             }
             end:
             if(is_object_in_range){

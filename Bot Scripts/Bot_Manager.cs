@@ -41,7 +41,6 @@ public class Bot_Manager : MonoBehaviour
             if(nextname == null){
                 goto Start; //Wenn der Ausgewählte name bereits auf null (benutzt worden) ist suche einen neuen Namen
             }
-            Debug.Log(i.GetComponentInChildren<TextMeshPro>().text);
             i.GetComponentInChildren<TextMeshPro>().text = nextname;
             //Reset alles für den nächsten run
             Randint = 0;

@@ -39,20 +39,8 @@ public class Movement : MonoBehaviour
     private GameObject Joystick1handle;
 
     void Awake(){
-        //Performance Settings from Menu
-        if(Menu_Handler.performancemode == false){
-            //-Low Performance settings-
-            QualitySettings.vSyncCount = 0;
-            Application.targetFrameRate = 30;
-            //Disable Post Processing
-            PostProcessingVolume.SetActive(false);
-        }else{
-            //-High Performance settings-
-            QualitySettings.vSyncCount = 0;
-            Application.targetFrameRate = 999;
-
-            PostProcessingVolume.SetActive(true);
-        }
+        //Handy schaltet nicht in Schlafmodus
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
         //Setz den Player auf die im Dropoff Screen angegebene Position
         //Skin Laden
         LoadPlayerSkin();
@@ -80,8 +68,27 @@ public class Movement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if(Dropoff_Handler.DropoffX != 0 || Dropoff_Handler.DropoffY != 0) Player.transform.position = new Vector3(Dropoff_Handler.DropoffX, Dropoff_Handler.DropoffY, 100f);//if statement nur für in editor bequemlichkeit
-        Debug.Log(Dropoff_Handler.DropoffX);
+        //Performance Settings from Menu
+        if(Menu_Handler.performancemode == false){
+            //-Low Performance settings-
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 30;
+            //Disable Post Processing
+            PostProcessingVolume.SetActive(false);
+        }else{
+            //-High Performance settings-
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 120;
+
+            PostProcessingVolume.SetActive(true);
+        }
+
+        //wenn Dropoff scene geladen wird:
+        //if(Dropoff_Handler.DropoffX != 0 || Dropoff_Handler.DropoffY != 0) Player.transform.position = new Vector3(Dropoff_Handler.DropoffX, Dropoff_Handler.DropoffY, 100f);//if statement nur für in editor bequemlichkeit
+        
+        //Drop off ohne Dropoff Handler:
+        //Random Position auf der Map
+        Player.transform.position = new Vector3(UnityEngine.Random.Range(-500f, 500f), UnityEngine.Random.Range(-500f, 500f), 112.2f); //Map Range
         //Player_Name_Ingame = Menu_Handler.Player_Name;
         Name_Text.GetComponent<TextMeshPro>().text = Player_Name_Ingame;
         World = GameObject.Find("World");

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class Map_Manager : MonoBehaviour
 {
@@ -92,14 +93,14 @@ public class Map_Manager : MonoBehaviour
     }
 
     IEnumerator PlayerCheck(){
-        yield return new WaitForSeconds(.2f); //Warte bis die ersten bots spawnen damit das spiel nicht denkt das man sofort gewonnen hat
+        yield return new WaitForSeconds(1f); //Warte bis die ersten bots spawnen damit das spiel nicht denkt das man sofort gewonnen hat. alle bots werden in der 1 sec gespawned
         while(true){
         try{
             x = GameObject.FindGameObjectsWithTag("Bot"); //Kostet leistung ist aber schnelli zu schreiben mann könnte aber alle gespawnen spieler beim spawnen in eine liste
             Playercount = x.Length; //packen und dann hier in einer schleife checken ob dieser slot in der array null ist oder nicht und daran dann checken wie viele spieler noch leben
             x = GameObject.FindGameObjectsWithTag("Player");
             Playercount += x.Length;
-            GameObject.Find("PlayerCount").GetComponent<Text>().text = Playercount.ToString();
+            GameObject.Find("PlayerCount").GetComponent<TextMeshProUGUI>().text = Playercount.ToString();
         }catch{}
 
         if(Playercount == 1){

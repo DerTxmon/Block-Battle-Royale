@@ -54,6 +54,8 @@ public class Bot_Behavior : MonoBehaviour
     private Rigidbody2D Bot_Name_Text_rb, Bot_Healthbar_rb;
     private RectTransform Bot_Name_Text_transform;
     private Bot_Shoot bot_shoot;
+    private Bot_Inventory inv;
+    private Animator anim;
     void Awake() {
         BewegungsängerungsZeit = 15f;
         StartCoroutine(Bot_Random_Move());
@@ -62,6 +64,8 @@ public class Bot_Behavior : MonoBehaviour
         Bot_Name_Text_transform = Bot_Name_Text.GetComponent<RectTransform>();
         bot_shoot = Bot.GetComponent<Bot_Shoot>();
         Bot_Healthbar_rb = Healthbar.GetComponent<Rigidbody2D>();
+        inv = Bot.GetComponent<Bot_Inventory>();
+        anim = Bot.GetComponent<Animator>();
     }
     void Start()
     {
@@ -71,18 +75,18 @@ public class Bot_Behavior : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         StartCoroutine(FootstepGen());
         StartCoroutine(CheckforPlayerDistance());
-        gameObject.GetComponent<Animator>().SetBool("isrunning", true);
+        anim.SetBool("isrunning", true); //weil bot nie stehen bleibt
     }
 
     void Update()
     {
         //Name Bleibt überm Kopf
         Bot_Name_Text_rb.rotation = 0;
-        Bot_Name_Text_transform.position = new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y + 1.5f, 0);
+        Bot_Name_Text_transform.position = Bot.transform.position + new Vector3(0, 1.5f, 0);
 
         //Healthbar bleibt rechts
         Bot_Healthbar_rb.rotation = 0;
-        Healthbar.transform.position = new Vector3(this.transform.position.x + .5f, this.transform.position.y ,0);
+        Healthbar.transform.position = Bot.transform.position + new Vector3(.5f, 0, 0);
 
         //Setzt die summen in eine Array ein, damit sie später ausgewertet werden können
         /*sums[0] = rightsum;
@@ -216,7 +220,7 @@ public class Bot_Behavior : MonoBehaviour
     public IEnumerator CheckforPlayerDistance(){
         while(true){
             Player_Distance = Vector2.Distance(new Vector2(Player.transform.position.x, Player.transform.position.y), new Vector2(this.gameObject.transform.position.x, this.gameObject.transform.position.y)); //misst wie weit der Bot vom Player weg ist um dann zu schauen ob Footsteps generiert werden müssen
-            if(Player_Distance < 70f){
+            if(Player_Distance < 150f){
                 spawn_steps = true;
             }else spawn_steps = false;
             yield return new WaitForSeconds(3f);
@@ -358,25 +362,24 @@ public class Bot_Behavior : MonoBehaviour
             //Random Waffe raus hohlen und dann schießen.
             if(!runaway){ //Nur wenn er nicht wegläuft schiessen sonst schießt er ins nichts
             StartCoroutine(bot_shoot.Shoot()); //Schießen
-            if(schleifeny <= 1 && Bot.GetComponent<Bot_Inventory>().lootcount > 0) schleifeny++;
+            if(schleifeny <= 1 && inv.lootcount > 0) schleifeny++;
             if(schleifeny == 1){
-                randomizerweaponmax = Bot.GetComponent<Bot_Inventory>().lootcount;
-                randomizerweapon = Random.Range(1, randomizerweaponmax);
+                randomizerweapon = Random.Range(1, inv.lootcount);
                 if(randomizerweapon == 1){
-                    Bot.GetComponent<Bot_Inventory>().Slot1_Selected = true;
-                    Bot.GetComponent<Bot_Inventory>().Slot2_Selected = false;
-                    Bot.GetComponent<Bot_Inventory>().Slot3_Selected = false;
+                    inv.Slot1_Selected = true;
+                    inv.Slot2_Selected = false;
+                    inv.Slot3_Selected = false;
                 }else if(randomizerweapon == 2){
-                    Bot.GetComponent<Bot_Inventory>().Slot1_Selected = false;
-                    Bot.GetComponent<Bot_Inventory>().Slot2_Selected = true;
-                    Bot.GetComponent<Bot_Inventory>().Slot3_Selected = false;
+                    inv.Slot1_Selected = false;
+                    inv.Slot2_Selected = true;
+                    inv.Slot3_Selected = false;
                 }else if(randomizerweapon == 3){
-                    Bot.GetComponent<Bot_Inventory>().Slot1_Selected = false;
-                    Bot.GetComponent<Bot_Inventory>().Slot2_Selected = false;
-                    Bot.GetComponent<Bot_Inventory>().Slot3_Selected = true;
+                    inv.Slot1_Selected = false;
+                    inv.Slot2_Selected = false;
+                    inv.Slot3_Selected = true;
                 }
-                //Animator soll den bot in Waffen haltung versetzen
-                Bot.GetComponent<Animator>().SetBool("Weaponactive", true);
+                //Animator soll den bot in Waffen haltung versetz
+                anim.SetBool("Weaponactive", true);
             }
             }
         }else{
@@ -394,6 +397,11 @@ public class Bot_Behavior : MonoBehaviour
             runaway = false;
             missaim = 0;
             Enemy = null;
+            //Check ob Enemy schon getötet wurde
+            /*inv.Slot1_Selected = false;
+            inv.Slot2_Selected = false;
+            inv.Slot3_Selected = false; //Hand wieder zurück
+            anim.SetBool("Weaponactive", false);*/
         }
         }
     }

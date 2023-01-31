@@ -31,9 +31,8 @@ public class Shoot : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(shootbttn == true){
-            StartCoroutine(shoot()); //Optimierbar indem die funtion nicht jeden Frame ausgeführt wird!!!!!!!!!!!!
-        }
+        if(shootbttn == true && !isshooting) StartCoroutine(shoot()); //Wird nur ausgeführt wenn spieler den letzten schuss zuende geführt hat
+        
 
         if(reloadbttn == true){
             StartCoroutine(reload());
@@ -80,7 +79,7 @@ public class Shoot : MonoBehaviour
 
     private IEnumerator shoot(){
         if(Inv.Slot1_Selected == true){
-        if(Inv.Slot1_Item == "" || Inv.Slot1_Item == null && !ishitting && !isshooting) StartCoroutine(Hit());
+        if(Inv.Slot1_Item == "" || Inv.Slot1_Item == null && !ishitting && !isshooting) StartCoroutine(Hit()); //Schlagen
         //Glock-18
         if(Inv.Glock_18_Selected == true && isshooting == false && Inv.slot1_mag_ammo > 0){
             isshooting = true;
