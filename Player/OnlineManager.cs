@@ -11,7 +11,7 @@ public class OnlineManager : MonoBehaviour
     public static int NewID = 0;
     public static int FriendExistance;
     public static string[] Shopinfo = new string[10];
-    public static string URL = "http://192.168.0.187/BBR/BBR.php"; //IP Adresse des Servers
+    public static string URL = "http://91.4.245.35:999/BBR/BBR.php"; //IP Adresse des Servers
 
     private void Awake() {
         //init GlobalBest Array

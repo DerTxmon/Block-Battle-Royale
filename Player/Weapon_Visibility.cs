@@ -30,6 +30,17 @@ public class Weapon_Visibility : MonoBehaviour
             Weapons.transform.Find("Glock_18_Top_Sprite").gameObject.SetActive(false);
             h = true;
         }
+        //Mp7
+        if(gameObject.GetComponent<Inventory_Handler>().Mp7_Selected == true){
+            Weapons.transform.Find("Mp7_Top_Sprite").gameObject.SetActive(true);
+            //Slow down
+            gameObject.GetComponent<Movement>().speed = 6.5f;
+            h = false;
+            goto end;
+        }else if(gameObject.GetComponent<Inventory_Handler>().Mp7_Selected == false){
+            Weapons.transform.Find("Mp7_Top_Sprite").gameObject.SetActive(false);
+            h = true;
+        }
         //M4
         if(gameObject.GetComponent<Inventory_Handler>().M4_Selected == true){
             Weapons.transform.Find("M4_Top_Sprite").gameObject.SetActive(true);
@@ -61,6 +72,17 @@ public class Weapon_Visibility : MonoBehaviour
             goto end;
         }else if(gameObject.GetComponent<Inventory_Handler>().Sniper_Selected == false){
             Weapons.transform.Find("Sniper_Top_Sprite").gameObject.SetActive(false);
+            h = true;
+        }
+        //Shotgun
+        if(gameObject.GetComponent<Inventory_Handler>().Shotgun_Selected == true){
+            Weapons.transform.Find("Shotgun_Top_Sprite").gameObject.SetActive(true);
+            //Slow down
+            gameObject.GetComponent<Movement>().speed = 6.5f;
+            h = false;
+            goto end;
+        }else if(gameObject.GetComponent<Inventory_Handler>().Shotgun_Selected == false){
+            Weapons.transform.Find("Shotgun_Top_Sprite").gameObject.SetActive(false);
             h = true;
         }
         end:

@@ -142,6 +142,10 @@ public class Bot_Optimazation : MonoBehaviour
         foreach(GameObject item in GameObject.FindGameObjectsWithTag("Sniper")){
             Items.Add(item);
         }
+        //Alle Mp7
+        foreach(GameObject item in GameObject.FindGameObjectsWithTag("Mp7")){
+            Items.Add(item);
+        }
         //Alle Heals
         foreach(GameObject item in GameObject.FindGameObjectsWithTag("Heal")){
             Items.Add(item);

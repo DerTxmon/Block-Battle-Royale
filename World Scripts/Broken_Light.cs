@@ -1,13 +1,13 @@
 using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.Rendering.Universal;
 using UnityEngine;
 
 
 public class Broken_Light : MonoBehaviour
 {
-    public UnityEngine.Rendering.Universal.Light2D Light;
+    public Light2D Light;
     private void Awake() {
-        Light = GetComponent<UnityEngine.Rendering.Universal.Light2D>();
+        Light = GetComponent<Light2D>();
         StartCoroutine(BrokenLight());    
     }
     private IEnumerator BrokenLight() {

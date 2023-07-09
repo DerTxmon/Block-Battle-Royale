@@ -12,7 +12,7 @@ public class Bot_PlayerContact : MonoBehaviour
     [SerializeField] private LayerMask layerMask;
     private RaycastHit2D[] contactPoints = new RaycastHit2D[100];
     private Vector2[] endpos = new Vector2[100];
-    private string[] Itemtags = new string[] {"Glock_18", "M4", "AK_47", "Sniper"};
+    private string[] Itemtags = new string[] {"Glock_18", "M4", "AK_47", "Sniper", "Mp7"};
     private string[] Ammotags = new string[] {"Big_Ammo", "Mid_Ammo", "Small_Ammo", "Heal", "Kiste_Oben", "Kiste_Unten", "Kiste_Rechts", "Kiste_Links"}; //Ammo und Heal
     public string[] Kistentags = new string[] {"Kiste_Oben", "Kiste_Unten", "Kiste_Rechts", "Kiste_Links"}; //Kisten
     [SerializeField] public List<int> Entryids = new List<int>();

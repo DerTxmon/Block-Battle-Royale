@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class UI_Handler : MonoBehaviour
 {
@@ -23,6 +24,7 @@ public class UI_Handler : MonoBehaviour
     public List<Image> HudComponents_Img;
     public List<SpriteRenderer> HudComponents_Sprites;
     public List<Text> HudComponents_Text;
+    public List<TextMeshProUGUI> HudComponents_TMP;
     private float x;
     public GameObject[] MapTexte;
     public GameObject World, DeathWinPoint;
@@ -31,9 +33,14 @@ public class UI_Handler : MonoBehaviour
     public Image LoadingScreen;
     [SerializeField] private GameObject BBRLogo_LoadingScreen;
     [SerializeField] private GameObject PlayerModel_LoadingScreen;
-    void Awake(){
+    [SerializeField] private GameObject Car_Button;
+    [SerializeField] private GameObject Minimap;
+    [SerializeField] private GameObject joystick3;
+    [SerializeField] private GameObject joystick4;
+    [SerializeField] private TextMeshProUGUI KillCounter;
+    void Awake() {
         //Start Musik Lautstärke
-        LoadingScreen.GetComponent<AudioSource>().volume = Menu_Handler.loadeddata.Menu_Music_Volume;
+        //LoadingScreen.GetComponent<AudioSource>().volume = Menu_Handler.loadeddata.Menu_Music_Volume;
         foreach(GameObject i in HUD){
             if(i.GetComponent<SpriteRenderer>() != null){
                 HudComponents_Sprites.Add(i.gameObject.GetComponent<SpriteRenderer>()); //Nimmt jedes GameObject aus dem Hud und trägt den Color component in eine liste ein um beim tod das hud langsam aus zublenden
@@ -41,8 +48,10 @@ public class UI_Handler : MonoBehaviour
                 HudComponents_Img.Add(i.gameObject.GetComponent<Image>());
             }else if(i.GetComponent<Text>() != null){
                 HudComponents_Text.Add(i.gameObject.GetComponent<Text>());
+            }else if(i.GetComponent<TextMeshProUGUI>() != null){
+                HudComponents_TMP.Add(i.gameObject.GetComponent<TextMeshProUGUI>());
             }
-        }
+        }   
         //Blend LoadingScreenscreen aus
         StartCoroutine(LoadingScreenFadeout());
     }
@@ -57,7 +66,6 @@ public class UI_Handler : MonoBehaviour
         float PointY = transform.position.y / 7f;
         Point.GetComponent<RectTransform>().localPosition = new Vector3(PointX, PointY, 0f);
     }
-
     public IEnumerator LoadingScreenFadeout(){
         //Player Model Skin Geben
         PlayerModel_LoadingScreen.GetComponent<Image>().sprite = Menu_Handler.PlayerModel_LoadingScreen_Image;
@@ -94,7 +102,36 @@ public class UI_Handler : MonoBehaviour
         }
         //LoadingScreen.gameObject.SetActive(false);
     }
-
+    public void isAtCar(){
+        //Aktiviere den Car Enter Button
+        Car_Button.SetActive(true);
+    }
+    public void isNotAtCar(){
+        //Deaktiviere den Car Enter Button
+        Car_Button.SetActive(false);
+    }
+    public void DeactivateAllHud(){
+        //Deaktiviere alle Hud Elemente
+        foreach(SpriteRenderer i in HudComponents_Sprites){
+            i.enabled = false;
+        }
+        foreach(Image i in HudComponents_Img){
+            i.enabled = false;
+        }
+        foreach(Text i in HudComponents_Text){
+            i.enabled = false;
+        }
+        foreach(TextMeshProUGUI i in HudComponents_TMP){
+            i.enabled = false;
+        }
+    }
+    public void ActivateCarHud(){
+        joystick3.SetActive(true);
+        joystick4.SetActive(true);
+        Minimap.GetComponent<Image>().enabled = true;
+        Point.GetComponent<Image>().enabled = true;
+        
+    }
     public void Mapbutton(){
         //Mache Alles auf der Karte sichtbar
         /*foreach(GameObject i in AllrenderableGameObjects){
@@ -129,6 +166,10 @@ public class UI_Handler : MonoBehaviour
     public void BacktoHome(){
         Time.timeScale = 1;
         SceneManager.LoadScene(sceneName:"Title_Menu");
+    }
+
+    public void UpdateKillCounter(){
+        KillCounter.text = Inv.Kills.ToString();
     }
     
     private void Calcstats(){
@@ -233,6 +274,14 @@ public class UI_Handler : MonoBehaviour
             }
             //und Text
             foreach(Text i in HudComponents_Text){
+                i.color = new Color(i.color.r, i.color.g, i.color.b, i.color.a - 0.003921568627451f);
+                
+                if(runs == 254){
+                    i.gameObject.SetActive(false); //wenn alles durchsitig ist dann ganz deaktivieren damit nichts ausversehen gedrückt wird
+                }
+            }
+            //und TMP Text
+            foreach(TextMeshProUGUI i in HudComponents_TMP){
                 i.color = new Color(i.color.r, i.color.g, i.color.b, i.color.a - 0.003921568627451f);
                 
                 if(runs == 254){

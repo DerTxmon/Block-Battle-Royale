@@ -5,7 +5,7 @@ $username = "admin";
 $password = "bti";
 $db = "BBR"; //Datenbank Name
 // Create connection
-$mysqli = new mysqli("localhost:3306", $username, $password,$db);
+$mysqli = new mysqli($servername, $username, $password,$db);
 
 //Check ob die connection geklappt hat
 if (mysqli_connect_errno()) {

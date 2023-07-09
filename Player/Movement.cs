@@ -5,10 +5,12 @@ using UnityEngine.EventSystems;
 using TMPro;
 using UnityEngine.U2D.Animation;
 using System;
+using UnityEngine.UI;
 
 public class Movement : MonoBehaviour
 {
     public float speed;
+    public float carspeed;
     Rigidbody2D rb;
     public FixedJoystick joystick1;
     public FixedJoystick joystick2;
@@ -34,17 +36,43 @@ public class Movement : MonoBehaviour
     public bool lootbutton;
     public string Player_Name_Ingame;
     public GameObject Name_Text;
-    public GameObject PostProcessingVolume, Wald;
+    public GameObject PostProcessingVolume;
+    public Sprite ShootRotationhandle;
     public SpriteLibraryAsset DefaultSkinLibrary, AgentSkinLibrary, BetaSkinLibrary, ClownSkinLibrary, AlienSkinLibrary, OttoSkinLibrary, ChrisSkinLibrary;
     private GameObject Joystick1handle;
+    public Image Joystick2handle;
+    private Shoot shoot;
+    private bool shootwhilerotate;
+    public Camera MainCam;
+    public GameObject Camfollowthis;
+    public Transform TargetTransform;
+    public GameObject EnterableCar;
+    public SpriteRenderer Kopf;
+    public SpriteRenderer Arm_Rechts;
+    public SpriteRenderer Arm_Links;
+    public bool CarStearing;
+    [SerializeField] private FixedJoystick joystickfahren;
+    [SerializeField] private FixedJoystick joysticklenken;
+    private Rigidbody2D CarRB;
+    public GameObject CarCamPoint;
+    public float beschleunigung;
+    private float lastY;
+    float Yvel;
+    int tempzähler;
+    public bool Vorwährts;
 
     void Awake(){
-        //Handy schaltet nicht in Schlafmodus
-        Screen.sleepTimeout = SleepTimeout.NeverSleep;
-        //Setz den Player auf die im Dropoff Screen angegebene Position
+        Camfollowthis = Player;
         //Skin Laden
         LoadPlayerSkin();
         Joystick1handle = joystick1.transform.Find("Handle").gameObject;
+        shoot = GetComponent<Shoot>();
+        if(Menu_Handler.localdata.VisionShootSwitch){
+            shootwhilerotate = true;
+            Joystick2handle.sprite = ShootRotationhandle; //Rotation Handle Auge wird zum Schuss Handle. Schuss handle ist default
+        }else shootwhilerotate = false;
+        //Setze die Target Transform sofort auf den Spieler
+        TargetTransform = Player.transform;
     }
 
     public void LoadPlayerSkin(){
@@ -65,7 +93,6 @@ public class Movement : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         //Performance Settings from Menu
@@ -88,8 +115,10 @@ public class Movement : MonoBehaviour
         
         //Drop off ohne Dropoff Handler:
         //Random Position auf der Map
-        Player.transform.position = new Vector3(UnityEngine.Random.Range(-500f, 500f), UnityEngine.Random.Range(-500f, 500f), 112.2f); //Map Range
-        //Player_Name_Ingame = Menu_Handler.Player_Name;
+        //Player.transform.position = new Vector3(UnityEngine.Random.Range(-500f, 500f), UnityEngine.Random.Range(-500f, 500f), 112.2f); //Map Range
+        //Testing
+        Player.transform.position = new Vector3(-103, -30, 112.2f);
+        Player_Name_Ingame = Menu_Handler.Player_Name;
         Name_Text.GetComponent<TextMeshPro>().text = Player_Name_Ingame;
         World = GameObject.Find("World");
         rb = GetComponent<Rigidbody2D>();
@@ -98,68 +127,140 @@ public class Movement : MonoBehaviour
         StartCoroutine(FootstepGen());
     }
 
-    // Update is called once per frame
     void Update(){
         //Namen überm Kopf anzeigen
         //Name_Text.GetComponent<Rigidbody2D>().rotation = 0;
         //Name_Text.GetComponent<RectTransform>().position = new Vector2(this.gameObject.transform.position.x, this.gameObject.transform.position.y + 1.5f);
+        MainCam.transform.position = new Vector3(Camfollowthis.transform.position.x, Camfollowthis.transform.position.y, -10f);
     }
 
-    void FixedUpdate()
-    {   
-        float X = joystick1.Horizontal;
-        float Y = joystick1.Vertical;
+    void FixedUpdate(){   
+        if(!CarStearing){
+            float X = joystick1.Horizontal;
+            float Y = joystick1.Vertical;
 
-        Vector2 movementDir = new Vector2(X  * speed * Time.fixedDeltaTime, Y  * speed * Time.fixedDeltaTime);
+            Vector2 movementDir = new Vector2(X  * speed * Time.fixedDeltaTime, Y  * speed * Time.fixedDeltaTime);
 
-        transform.Translate(movementDir, Space.World);
+            TargetTransform.Translate(movementDir, Space.World);
 
-        if(transform.position != lastpos){
-            animatior.SetBool("isrunning", true);
-            //Animation speed
-            float animspeed;
-            animspeed = ((Vector2.Distance(Joystick1handle.transform.position, joystick1.transform.position)) / 2.37f) * 1.5f; //distanz vom halde vom center berechnen(max ist 2.37 um also auf eine range von 0-1 zu kommen teilen wir durch max)
-            animatior.SetFloat("runspeed", animspeed);
-            steping = true;
-        }else{
-            animatior.SetBool("isrunning", false);
-            animatior.SetFloat("runspeed", 1f);
-            steping = false;
-        }
-        lastpos = transform.position;
+            if(transform.position != lastpos){
+                animatior.SetBool("isrunning", true);
+                //Animation speed
+                float animspeed;
+                animspeed = ((Vector2.Distance(Joystick1handle.transform.position, joystick1.transform.position)) / 2.37f) * 1.5f; //distanz vom halde vom center berechnen(max ist 2.37 um also auf eine range von 0-1 zu kommen teilen wir durch max)
+                animatior.SetFloat("runspeed", animspeed);
+                steping = true;
+            }else{
+                animatior.SetBool("isrunning", false);
+                animatior.SetFloat("runspeed", 1f);
+                steping = false;
+            }
+            lastpos = transform.position;
 
-        //Rotation für rotationsstick setzen
-        if(joystick2.Horizontal != 0f || joystick2.Vertical != 0f){
-            RotateY = joystick2.Vertical;
-            RotateX = joystick2.Horizontal;
-        }else{
-            RotateX = 0f;
-            RotateY = 0f;
-        }
+            //Rotation für rotationsstick setzen
+            if(joystick2.Horizontal != 0f || joystick2.Vertical != 0f){
+                RotateY = joystick2.Vertical;
+                RotateX = joystick2.Horizontal;
+                if(shootwhilerotate) shoot.shootbttn2 = true; //Wenn Spieler sich rotiert dann soll er auch schießen (bisschen ekhelig geschrieben)
+            }else{
+                RotateX = 0f;
+                RotateY = 0f;
+                //shoot.shootbttn = false;
+                shoot.shootbttn2 = false; //Wenn bttn2 false ist kann spieler aber trotzdem noch bttn1 mit dem shoot button im ui auf true setzen
+            }
 
-        //in die richtung drehen in die man läuft falls roatations stick nicht bewegt wird
-        if(X != 0 || Y != 0 && new Vector2(RotateX,RotateY) == Vector2.zero){
-            transform.up = new Vector2(X,Y);
-        }
+            //in die richtung drehen in die man läuft falls roatations stick nicht bewegt wird
+            if(X != 0 || Y != 0 && new Vector2(RotateX,RotateY) == Vector2.zero){
+                transform.up = new Vector2(X,Y);
+            }
 
-        if(new Vector2(RotateX,RotateY) != Vector2.zero){
-            transform.up = new Vector2(RotateX,RotateY);
-        }
+            if(new Vector2(RotateX,RotateY) != Vector2.zero){
+                transform.up = new Vector2(RotateX,RotateY);
+            }
+            }/*else{
+            //Car Stearing
+            float X = joysticklenken.Horizontal;
+            float Y = joystickfahren.Vertical;
+            
+            if(MathF.Abs(Y) > 0f){ //Wenn Gas gegeben wird
+                if(Y > 0f){ //Vorwährts fahren
+                    if(!Vorwährts) beschleunigung = 0.1f; //Beschleunigung beim gangwächsel auf 0 setzen
+                    Vorwährts = true;
+                    //Beschleunigung erhöhen
+                    if(beschleunigung > .6f) beschleunigung *= 1.002f; //Exponenziel beschleunigen aber langsamer
+                    else if(beschleunigung < 1f) beschleunigung *= 1.004f; //Exponenziel beschleunigen
+                    if(beschleunigung > 1f) beschleunigung = 1f; //Damit beschleunigung nicht über 1 geht
+                    Yvel = Y;
+                }else if(Y < 0f){ //Rückwärts fahren
+                    if(Vorwährts) beschleunigung = 0.1f; //Beschleunigung beim gangwächsel auf 0 setzen
+                    Vorwährts = false;
+                    if(beschleunigung < 1f) beschleunigung *= 1.002f; //Exponenziel beschleunigen
+                    if(beschleunigung > .7f) beschleunigung = 1f; //Damit beschleunigung nicht über 1 geht
+                    Yvel = MathF.Abs(Y);
+                }else if(Y == 0f){
+                    if(beschleunigung != 0f){
+                        beschleunigung *= .9f; //Beschleunigung verringern
+                        beschleunigung = (float)Decimal.Round((decimal)beschleunigung, 1); //Rundet beschleunigung auf eine nachkommastelle
+                    }
+                    Yvel *= .9f;
+                }
+            } Debug.Log("Beschleunigung: " + beschleunigung);
+
+            //Check ob sich das fahrzeug bewegt
+            if(lastpos != TargetTransform.position){
+                //Beschleunigung
+                //Lenken
+                X *= -1f;
+                if(Y < 0) X *= -1f; //Rückwärts fahrend
+                float rotation = X * (Y * 50f); //man rotiert schneller desto schneller man fährt
+                if(Y != 0) CarRB.rotation += rotation * Time.fixedDeltaTime;
+            }
+            lastpos = TargetTransform.position;
+
+            //Apply Force
+            CarRB.velocity = new Vector2(0f, Yvel * 450f * beschleunigung * carspeed * Time.fixedDeltaTime); //450f ist der grundsatz.
+
+            //Player folgt imaginär dem fahrzeug
+            transform.position = new Vector2(TargetTransform.position.x, TargetTransform.position.y);
+        }*/
     }
 
     private IEnumerator FootstepGen(){
         begin:
         for( ;steping; ){
             Instantiate(Footsteps,new Vector3(transform.position.x, transform.position.y, 121f), transform.rotation);
-            yield return new WaitForSeconds(.2f);
+            yield return new WaitForSeconds(.13f);
             if(!steping) break;
             Instantiate(Footsteps2, new Vector3(transform.position.x, transform.position.y, 121f), transform.rotation);
-            yield return new WaitForSeconds(.2f);
+            yield return new WaitForSeconds(.13f);
         }
         if(!steping){
-            yield return new WaitForSeconds(.2f);
+            yield return new WaitForSeconds(.13f);
             goto begin;
         }
+    }
+
+    public void EnterCar(){
+        CarStearing = true;
+        //Hide the Player (3 Körperteile)
+        Kopf.enabled = false;
+        Arm_Rechts.enabled = false;
+        Arm_Links.enabled = false;
+        //Collider
+        this.gameObject.GetComponent<Collider2D>().enabled = false;
+        //Hud Aus Schalten
+        this.gameObject.GetComponent<UI_Handler>().DeactivateAllHud();
+        //Wichtige Hud Elemente wieder Anschalten
+        
+        this.gameObject.GetComponent<UI_Handler>().ActivateCarHud();
+        Camfollowthis = CarCamPoint;
+        TargetTransform = EnterableCar.transform;
+        CarRB = EnterableCar.GetComponent<Rigidbody2D>();
+        //Camera Zoom
+        StartCoroutine(GetComponent<Inventory_Handler>().CarZoomOut());
+    }
+    public void ExitCar(){
+        StartCoroutine(GetComponent<Inventory_Handler>().CameraZoomOut());
     }
 
     public void enterlooting(){

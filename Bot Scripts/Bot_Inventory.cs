@@ -16,16 +16,16 @@ public class Bot_Inventory : MonoBehaviour
     public int big_ammo;
     public int slot1_mag_ammo, slot2_mag_ammo, slot3_mag_ammo;
     public int lootcount, lootcount2, Player_Heal, Player_Heal2;
-    public bool Glock_18_Selected, M4_Selected, Ak47_Selected, Sniper_Selected;
+    public bool Glock_18_Selected, M4_Selected, Ak47_Selected, Sniper_Selected, Mp7_Selected;
     public GameObject Bot;
-    public GameObject Glock_18_Top_Sprite, Ak47_Top_Sprite, M4_Top_Sprite, Sniper_Top_Sprite;
+    public GameObject Glock_18_Top_Sprite, Ak47_Top_Sprite, M4_Top_Sprite, Sniper_Top_Sprite, Mp7_Top_Sprite;
     
     void Awake(){
         int rand = Random.Range(0, 3);
-        if(rand == 1){ // 33% chance
+        if(rand == 1){ // 50% chance
             Slot1 = true;
             Slot1_Item = "Glock_18"; //Bot bekommt zum Start eine Glock
-            slot1_mag_ammo = 20;
+            slot1_mag_ammo = 25;
             Slot1_Selected = true;
             lootcount++;
             lootcount2++;
@@ -41,7 +41,6 @@ public class Bot_Inventory : MonoBehaviour
     void LateUpdate() {
         lootcount = lootcount2; //Ist dazu da den Lootcount ein wenig später zu aktualisieren damit langsame handys keine Probleme beim Lootcount haben
         Player_Heal = Player_Heal2; 
- 
     }
     
     private void OnTriggerEnter2D(Collider2D collision) {
@@ -65,6 +64,11 @@ public class Bot_Inventory : MonoBehaviour
             Slot1 = true;
             slot1_mag_ammo = collision.gameObject.GetComponent<Weapon_Info>().Currentammo;
         }
+        else if(collision.gameObject.tag == "Mp7" && lootcount <= 3){
+            Slot1_Item = "Mp7";
+            Slot1 = true;
+            slot1_mag_ammo = collision.gameObject.GetComponent<Weapon_Info>().Currentammo;
+        }
         }
         //Slot2
         else if(Slot2 == false && Slot1 == true){
@@ -82,6 +86,11 @@ public class Bot_Inventory : MonoBehaviour
             slot2_mag_ammo = collision.gameObject.GetComponent<Weapon_Info>().Currentammo;
         }else if(collision.gameObject.tag == "Sniper" && lootcount <= 3){
             Slot2_Item = "Sniper";
+            Slot2 = true;
+            slot2_mag_ammo = collision.gameObject.GetComponent<Weapon_Info>().Currentammo;
+        }
+        else if(collision.gameObject.tag == "Mp7" && lootcount <= 3){
+            Slot2_Item = "Mp7";
             Slot2 = true;
             slot2_mag_ammo = collision.gameObject.GetComponent<Weapon_Info>().Currentammo;
         }
@@ -105,22 +114,30 @@ public class Bot_Inventory : MonoBehaviour
             Slot3 = true;
             slot3_mag_ammo = collision.gameObject.GetComponent<Weapon_Info>().Currentammo;
         }
+        else if(collision.gameObject.tag == "Mp7" && lootcount <= 3){
+            Slot3_Item = "Mp7";
+            Slot3 = true;
+            slot3_mag_ammo = collision.gameObject.GetComponent<Weapon_Info>().Currentammo;
+        }
         }
         
         //Lootcount
         if(collision.gameObject.tag == "Glock_18" && lootcount < 3){
             lootcount2 += 1;
         }
-        if(collision.gameObject.tag == "M4" && lootcount < 3){
+        else if(collision.gameObject.tag == "M4" && lootcount < 3){
             lootcount2 += 1;
         }
-        if(collision.gameObject.tag == "AK_47" && lootcount < 3){
+        else if(collision.gameObject.tag == "AK_47" && lootcount < 3){
             lootcount2 += 1;
         }
-        if(collision.gameObject.tag == "Sniper" && lootcount < 3){
+        else if(collision.gameObject.tag == "Sniper" && lootcount < 3){
             lootcount2 += 1;
         }
-        if(collision.gameObject.tag == "Heal" && Player_Heal <= 4){
+        else if(collision.gameObject.tag == "Mp7" && lootcount < 3){
+            lootcount2 += 1;
+        }
+        else if(collision.gameObject.tag == "Heal" && Player_Heal <= 4){
             Player_Heal2 += 1;
         }
 
@@ -150,6 +167,8 @@ public class Bot_Inventory : MonoBehaviour
             Ak47_Selected = false;
             Sniper_Top_Sprite.transform.gameObject.SetActive(false);
             Sniper_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
         }else if(Slot1_Item == "M4"){
             //Aktive Waffe
             M4_Top_Sprite.transform.gameObject.SetActive(true);
@@ -161,6 +180,8 @@ public class Bot_Inventory : MonoBehaviour
             Ak47_Selected = false;
             Sniper_Top_Sprite.transform.gameObject.SetActive(false);
             Sniper_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
         }else if(Slot1_Item == "Ak47"){
             //Aktive Waffe
             Ak47_Top_Sprite.transform.gameObject.SetActive(true);
@@ -172,11 +193,28 @@ public class Bot_Inventory : MonoBehaviour
             Glock_18_Selected = false;
             Sniper_Top_Sprite.transform.gameObject.SetActive(false);
             Sniper_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
         }else if(Slot1_Item == "Sniper"){
             //Aktive Waffe
             Sniper_Top_Sprite.transform.gameObject.SetActive(true);
             Sniper_Selected = true;
             //Alle anderen Deaktivieren
+            M4_Top_Sprite.transform.gameObject.SetActive(false);
+            M4_Selected = false;
+            Ak47_Top_Sprite.transform.gameObject.SetActive(false);
+            Ak47_Selected = false;
+            Glock_18_Top_Sprite.transform.gameObject.SetActive(false);
+            Glock_18_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
+        }else if(Slot1_Item == "Mp7"){
+            //Aktive Waffe 
+            Mp7_Top_Sprite.transform.gameObject.SetActive(true);
+            Mp7_Selected = true;
+            //Alle anderen Deaktivieren
+            Sniper_Top_Sprite.transform.gameObject.SetActive(false);
+            Sniper_Selected = false;
             M4_Top_Sprite.transform.gameObject.SetActive(false);
             M4_Selected = false;
             Ak47_Top_Sprite.transform.gameObject.SetActive(false);
@@ -193,6 +231,8 @@ public class Bot_Inventory : MonoBehaviour
             Ak47_Selected = false;
             Glock_18_Top_Sprite.transform.gameObject.SetActive(false);
             Glock_18_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
         }
         }
 
@@ -208,6 +248,8 @@ public class Bot_Inventory : MonoBehaviour
             Ak47_Selected = false;
             Sniper_Top_Sprite.transform.gameObject.SetActive(false);
             Sniper_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
         }else if(Slot2_Item == "M4"){
             //Aktive Waffe
             M4_Top_Sprite.transform.gameObject.SetActive(true);
@@ -219,6 +261,8 @@ public class Bot_Inventory : MonoBehaviour
             Ak47_Selected = false;
             Sniper_Top_Sprite.transform.gameObject.SetActive(false);
             Sniper_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
         }else if(Slot2_Item == "Ak47"){
             //Aktive Waffe
             Ak47_Top_Sprite.transform.gameObject.SetActive(true);
@@ -230,6 +274,21 @@ public class Bot_Inventory : MonoBehaviour
             Glock_18_Selected = false;
             Sniper_Top_Sprite.transform.gameObject.SetActive(false);
             Sniper_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
+        }else if(Slot2_Item == "Mp7"){
+            //Aktive Waffe 
+            Mp7_Top_Sprite.transform.gameObject.SetActive(true);
+            Mp7_Selected = true;
+            //Alle anderen Deaktivieren
+            Sniper_Top_Sprite.transform.gameObject.SetActive(false);
+            Sniper_Selected = false;
+            M4_Top_Sprite.transform.gameObject.SetActive(false);
+            M4_Selected = false;
+            Ak47_Top_Sprite.transform.gameObject.SetActive(false);
+            Ak47_Selected = false;
+            Glock_18_Top_Sprite.transform.gameObject.SetActive(false);
+            Glock_18_Selected = false;
         }else if(Slot2_Item == "Sniper"){
             //Aktive Waffe
             Sniper_Top_Sprite.transform.gameObject.SetActive(true);
@@ -241,6 +300,8 @@ public class Bot_Inventory : MonoBehaviour
             Ak47_Selected = false;
             Glock_18_Top_Sprite.transform.gameObject.SetActive(false);
             Glock_18_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
         }else if(Slot2_Item == ""){
             //Alle anderen Deaktivieren
             Sniper_Top_Sprite.transform.gameObject.SetActive(false);
@@ -251,6 +312,8 @@ public class Bot_Inventory : MonoBehaviour
             Ak47_Selected = false;
             Glock_18_Top_Sprite.transform.gameObject.SetActive(false);
             Glock_18_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
         }
         }
 
@@ -266,6 +329,8 @@ public class Bot_Inventory : MonoBehaviour
             Ak47_Selected = false;
             Sniper_Top_Sprite.transform.gameObject.SetActive(false);
             Sniper_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
         }else if(Slot3_Item == "M4"){
             //Aktive Waffe
             M4_Top_Sprite.transform.gameObject.SetActive(true);
@@ -277,6 +342,8 @@ public class Bot_Inventory : MonoBehaviour
             Ak47_Selected = false;
             Sniper_Top_Sprite.transform.gameObject.SetActive(false);
             Sniper_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
         }else if(Slot3_Item == "Ak47"){
             //Aktive Waffe
             Ak47_Top_Sprite.transform.gameObject.SetActive(true);
@@ -288,6 +355,21 @@ public class Bot_Inventory : MonoBehaviour
             Glock_18_Selected = false;
             Sniper_Top_Sprite.transform.gameObject.SetActive(false);
             Sniper_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
+        }else if(Slot3_Item == "Mp7"){
+            //Aktive Waffe 
+            Mp7_Top_Sprite.transform.gameObject.SetActive(true);
+            Mp7_Selected = true;
+            //Alle anderen Deaktivieren
+            Sniper_Top_Sprite.transform.gameObject.SetActive(false);
+            Sniper_Selected = false;
+            M4_Top_Sprite.transform.gameObject.SetActive(false);
+            M4_Selected = false;
+            Ak47_Top_Sprite.transform.gameObject.SetActive(false);
+            Ak47_Selected = false;
+            Glock_18_Top_Sprite.transform.gameObject.SetActive(false);
+            Glock_18_Selected = false;
         }else if(Slot3_Item == "Sniper"){
             //Aktive Waffe
             Sniper_Top_Sprite.transform.gameObject.SetActive(true);
@@ -299,6 +381,8 @@ public class Bot_Inventory : MonoBehaviour
             Ak47_Selected = false;
             Glock_18_Top_Sprite.transform.gameObject.SetActive(false);
             Glock_18_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
         }else if(Slot3_Item == ""){
             //Alle anderen Deaktivieren
             Sniper_Top_Sprite.transform.gameObject.SetActive(false);
@@ -309,6 +393,8 @@ public class Bot_Inventory : MonoBehaviour
             Ak47_Selected = false;
             Glock_18_Top_Sprite.transform.gameObject.SetActive(false);
             Glock_18_Selected = false;
+            Mp7_Top_Sprite.transform.gameObject.SetActive(false);
+            Mp7_Selected = false;
         }
         }
     }

@@ -40,6 +40,7 @@ public class Player_Health : MonoBehaviour
         }else{
             Healthbar.GetComponent<Image>().color = Color.green;
         }
+        this.gameObject.GetComponent<Player_Health>().enabled = false; //Damit kein negatiever Schaden mehr gemacht werden kann
     }
 
     public IEnumerator Death(){

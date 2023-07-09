@@ -23,6 +23,7 @@ public class Map_Manager : MonoBehaviour
     [SerializeField] private GameObject Small_Ammo;
     [SerializeField] private GameObject Mid_Ammo;
     [SerializeField] private GameObject Big_Ammo;
+    [SerializeField] private GameObject Mp7;
     private float minus;
     public GameObject Player;
 
@@ -94,6 +95,7 @@ public class Map_Manager : MonoBehaviour
 
     IEnumerator PlayerCheck(){
         yield return new WaitForSeconds(1f); //Warte bis die ersten bots spawnen damit das spiel nicht denkt das man sofort gewonnen hat. alle bots werden in der 1 sec gespawned
+        bool won = false;
         while(true){
         try{
             x = GameObject.FindGameObjectsWithTag("Bot"); //Kostet leistung ist aber schnelli zu schreiben mann könnte aber alle gespawnen spieler beim spawnen in eine liste
@@ -103,7 +105,8 @@ public class Map_Manager : MonoBehaviour
             GameObject.Find("PlayerCount").GetComponent<TextMeshProUGUI>().text = Playercount.ToString();
         }catch{}
 
-        if(Playercount == 1){
+        if(Playercount == 1 && won == false){ //Wenn nur noch ein spieler lebt nur einmal ausführen weil loop leuft weiter und würde dann immer wieder ausführen
+            won = true;
             Win();
             break;
         }
@@ -124,7 +127,7 @@ public class Map_Manager : MonoBehaviour
             int rand = Random.Range(1,3); //(Kann nur zwischen 1 und 2 treffen) Rechne die chance ob überhaupt auf diesem spot irgendwas spawnen soll (50/50)
             if(rand == 1){
                 //Rechne die chancen für die Spawnende Waffe aus
-                rand = Random.Range(-1,104);//0-100
+                rand = Random.Range(-1,120);//0-100
 
                 if(rand < 41 && rand > -1){//0-40 (40%)
                 //Glock
@@ -152,6 +155,12 @@ public class Map_Manager : MonoBehaviour
                     item.GetComponent<Weapon_Info>().Currentammo = 25;
                     item = Instantiate(Mid_Ammo, new Vector3(i.transform.position.x + 0.3f, i.transform.position.y - 0.3f, 120f), Quaternion.identity);
                     item.GetComponent<Ammo_Info>().Ammo = 10;
+                }else if(rand < 121 && rand > 103){ //104-120 (16%)
+                //Mp7
+                    GameObject item = Instantiate(Mp7, new Vector3(i.transform.position.x, i.transform.position.y, 120f), Quaternion.identity);
+                    item.GetComponent<Weapon_Info>().Currentammo = 20;
+                    item = Instantiate(Small_Ammo, new Vector3(i.transform.position.x + 0.3f, i.transform.position.y - 0.3f, 120f), Quaternion.identity);
+                    item.GetComponent<Ammo_Info>().Ammo = 20;
                 }
             }
         }

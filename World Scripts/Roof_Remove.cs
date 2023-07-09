@@ -76,9 +76,9 @@ public class Roof_Remove : MonoBehaviour
                 Light10.SetActive(true);
             }
         }
-        if(collision.gameObject.tag == "Bot"){
-            collision.gameObject.GetComponent<Bot_Behavior>().inhouse = true;
-        }
+        //if(collision.gameObject.tag == "Bot"){
+        //    collision.gameObject.GetComponent<Bot_Behavior>().inhouse = true;
+        // }
     }
 
     private void OnTriggerExit2D(Collider2D collision) {
@@ -115,8 +115,8 @@ public class Roof_Remove : MonoBehaviour
                 Light10.SetActive(false);
             }
         }
-        if(collision.gameObject.tag == "Bot"){
-            collision.gameObject.GetComponent<Bot_Behavior>().inhouse = false;
-        }
+        //if(collision.gameObject.tag == "Bot"){
+        //    collision.gameObject.GetComponent<Bot_Behavior>().inhouse = false;
+        //}
     }
 }

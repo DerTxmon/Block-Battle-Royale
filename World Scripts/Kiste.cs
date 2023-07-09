@@ -8,7 +8,7 @@ public class Kiste : MonoBehaviour
     public GameObject Kisteobj;
     private Kiste_Check KisteCheck;
     public bool isopen;
-    public GameObject Sniper, M4, Glock, Ak47, Small_Ammo, Mid_Ammo, Big_Ammo, Heal;
+    public GameObject Sniper, M4, Glock, Ak47, Mp7, Small_Ammo, Mid_Ammo, Big_Ammo, Heal;
     private float Kiste_x_range1, Kiste_x_range2, Kiste_y_range1, Kiste_y_range2;
 
     // Start is called before the first frame update
@@ -46,17 +46,26 @@ public class Kiste : MonoBehaviour
             //-------
             //Für Kiste Unten und Kiste Rechts
             //-------
+
+            // 35% auf Glock
+            // 15% auf Mp7
+            // 15% auf Ak
+            // 20% auf M4
+            // 15% auf Sniper
+
             //2 Waffen spawnen
             for(int i = 0 ;i != 2; i++){
-                int weaponnum =  Random.Range(1, 100);
-                if(weaponnum >= 1 && weaponnum <= 20){ //20% auf Ak
+                int weaponnum =  Random.Range(0, 101);
+                if(weaponnum >= 1 && weaponnum <= 35){ //35% auf Glock
+                    Instantiate(Glock,  new Vector3(Kisteobj.transform.position.x + Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y - Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
+                }else if(weaponnum > 35 && weaponnum <= 50){ //15% auf Mp7
+                    Instantiate(Mp7,  new Vector3(Kisteobj.transform.position.x + Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y - Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
+                }else if(weaponnum > 50 && weaponnum <= 65){ //15% auf Ak
                     Instantiate(Ak47,  new Vector3(Kisteobj.transform.position.x + Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y - Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
-                }else if(weaponnum > 20 && weaponnum <= 50){ //30% auf M4
-                    Instantiate(M4,  new Vector3(Kisteobj.transform.position.x + Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y - Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
-                }else if(weaponnum > 50 && weaponnum <= 60){ //10% auf Sniper
-                    Instantiate(Sniper,  new Vector3(Kisteobj.transform.position.x + Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y - Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
-                }else if(weaponnum > 60 && weaponnum <= 100){ //40% auf Glock
-                    Instantiate(Glock, new Vector3(Kisteobj.transform.position.x + Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y - Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
+                }else if(weaponnum > 65 && weaponnum <= 85){ //20% auf M4
+                    Instantiate(M4, new Vector3(Kisteobj.transform.position.x + Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y - Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
+                }else if(weaponnum > 85 && weaponnum <= 100){ //15% auf Sniper
+                    Instantiate(Sniper, new Vector3(Kisteobj.transform.position.x + Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y - Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
                 }
                 yield return new WaitForSeconds(0.01f);
             }
@@ -82,15 +91,17 @@ public class Kiste : MonoBehaviour
             //Für Kiste Oben und Kiste Links
             //-------
             for(int i = 0 ;i != 2; i++){
-                int weaponnum =  Random.Range(1, 100);
-                if(weaponnum >= 1 && weaponnum <= 20){ //20% auf Ak
+                int weaponnum =  Random.Range(0, 101);
+                if(weaponnum >= 1 && weaponnum <= 35){ //35% auf Glock
+                    Instantiate(Glock,  new Vector3(Kisteobj.transform.position.x - Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y + Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
+                }else if(weaponnum > 35 && weaponnum <= 50){ //15% auf Mp7
+                    Instantiate(Mp7,  new Vector3(Kisteobj.transform.position.x - Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y + Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
+                }else if(weaponnum > 50 && weaponnum <= 65){ //15% auf Ak
                     Instantiate(Ak47,  new Vector3(Kisteobj.transform.position.x - Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y + Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
-                }else if(weaponnum > 20 && weaponnum <= 50){ //30% auf M4
-                    Instantiate(M4,  new Vector3(Kisteobj.transform.position.x - Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y + Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
-                }else if(weaponnum > 50 && weaponnum <= 60){ //10% auf Sniper
-                    Instantiate(Sniper,  new Vector3(Kisteobj.transform.position.x - Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y + Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
-                }else if(weaponnum > 60 && weaponnum <= 100){ //40% auf Glock
-                    Instantiate(Glock, new Vector3(Kisteobj.transform.position.x - Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y + Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
+                }else if(weaponnum > 65 && weaponnum <= 85){ //20% auf M4
+                    Instantiate(M4, new Vector3(Kisteobj.transform.position.x - Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y + Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
+                }else if(weaponnum > 85 && weaponnum <= 100){ //15% auf Sniper
+                    Instantiate(Sniper, new Vector3(Kisteobj.transform.position.x - Random.Range(Kiste_x_range1, Kiste_x_range2), Kisteobj.transform.position.y + Random.Range(Kiste_y_range1,Kiste_y_range2), 120f), Quaternion.identity);
                 }
                 yield return new WaitForSeconds(0.01f);
             }

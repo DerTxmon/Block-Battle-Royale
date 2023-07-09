@@ -124,11 +124,9 @@ public class Menu_Handler : MonoBehaviour
     [SerializeField] private GameObject BBRLogo_LoadingScreen;
     [SerializeField] public GameObject PlayerModel_LoadingScreen;
     public static Sprite PlayerModel_LoadingScreen_Image;
-
+    [SerializeField] private Image VisionShootSwitchButton;
+    [SerializeField] private Sprite VisionShootSwitchOff, VisionShootSwitchOn;
     void Awake(){
-        //Immer im Menü volle leistung
-        QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = 999;
         instance = this;
         //50 50 ob Ad Button erscheint
         int randnum = UnityEngine.Random.Range(0, 2);
@@ -145,10 +143,10 @@ public class Menu_Handler : MonoBehaviour
         //Init Ads
         if(loadadcounter >= 1) AdButton.GetComponent<RewardedAdsButton>().LoadAd();  //Aber nur nach dem ersten start   
         loadadcounter++;
+        
     }
-
     void Start(){
-        //FPS auf 120 schalten
+        //-High Performance settings-
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 120;
         try{
@@ -228,6 +226,12 @@ public class Menu_Handler : MonoBehaviour
         LobbyMusic.GetComponent<AudioSource>().volume = loadeddata.Menu_Music_Volume;
         //Music Slider
         MusicSlider.GetComponent<Slider>().value = loadeddata.Menu_Music_Volume;
+        //Vision Switch
+        if(loadeddata.VisionShootSwitch){
+            VisionShootSwitchButton.sprite = VisionShootSwitchOn;
+        }else{
+            VisionShootSwitchButton.sprite = VisionShootSwitchOff;
+        }
     }
 
     //User Saved Data Object
@@ -255,6 +259,7 @@ public class Menu_Handler : MonoBehaviour
         public string joinedversion;
         public int[] FriendsIDs = new int[6]; //Wird bei aufrufen der Freunde einmal durchgelooped
         public float Menu_Music_Volume = .5f;
+        public bool VisionShootSwitch = false;
     }
 
     public void InitLevel(){
@@ -559,19 +564,14 @@ public class Menu_Handler : MonoBehaviour
         return pingable;
     }
     public void FriendButtonMenu(){
-        /*if(Application.internetReachability != NetworkReachability.NotReachable){
+        if(Application.internetReachability != NetworkReachability.NotReachable){
             //Schau ob der Server auch erreicht werden kann mit einem Ping
-            if(PingHost("192.168.0.187")){
-                LoadingText.GetComponent<Text>().text = "Loading...";
-                StartCoroutine(FriendsWindowCR()); //Fetch Friends from Server
-            }else{
-                LoadingText.GetComponent<Text>().text = "Cant reach Server";
-            }
+            LoadingText.GetComponent<Text>().text = "Loading...";
+            StartCoroutine(FriendsWindowCR()); //Fetch Friends from Server
         }else{//Mach den Button Grau
             Friends_Button.GetComponent<Image>().sprite = FriendsButtonSpriteNoConnection;
             Friends_Button.GetComponent<Button>().interactable = false;
-        }*/
-        StartCoroutine(FriendsWindowCR()); //Fetch Friends from Server
+        }
     }
     public IEnumerator FriendsWindowCR(){
         //Deactivate Hud
@@ -1197,7 +1197,7 @@ public class Menu_Handler : MonoBehaviour
 
     public void StartGame(){
         //Load the Game
-        StartCoroutine(LoadGame());
+       StartCoroutine(LoadGame());
     }
     public IEnumerator LoadGame(){
         //Blend langsam den Black screen ein und lad dann die scene
@@ -1235,16 +1235,6 @@ public class Menu_Handler : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         SceneManager.LoadSceneAsync(sceneName:"Game");
-    }
-
-    public void AddBot(){
-        if(Menu_Bots < 20)Menu_Bots += 1;
-        //Bot_Counter.text = Menu_Bots.ToString();
-    }
-
-    public void RemoveBot(){
-        if(Menu_Bots > 0) Menu_Bots -= 1;
-        //Bot_Counter.text = Menu_Bots.ToString();
     }
     public void Settings(){
         Player.SetActive(false); //Deaktiviere das Ganze Menü und mache nur die Settings sichtbar
@@ -1319,6 +1309,16 @@ public class Menu_Handler : MonoBehaviour
         SkinInfoTafel.SetActive(false);
         AdButton.GetComponent<Image>().enabled = true;
         AdButton.GetComponent<Button>().enabled = true;
+    }
+    public void VisionShootSwitch(){
+        if(localdata.VisionShootSwitch){
+            localdata.VisionShootSwitch = false;
+            VisionShootSwitchButton.GetComponent<Image>().sprite = VisionShootSwitchOff;
+        }else{
+            localdata.VisionShootSwitch = true;
+            VisionShootSwitchButton.GetComponent<Image>().sprite = VisionShootSwitchOn;
+        }
+        StartCoroutine(InitUserData3());
     }
 
     public void MusicSettingChanged(float newVolume){
@@ -1460,7 +1460,7 @@ public class Menu_Handler : MonoBehaviour
         }
         else if(loadeddata.SelectedSkin == "Clown"){
             ClownSkinButton.sprite = ClownSkinButtonGreen;
-            Menu_Skin_Display.GetComponent<Image>().sprite = ClownDisplayModel;
+            Menu_Skin_Display.GetComponent<Image>().sprite =   ClownDisplayModel;
         } 
         else if(loadeddata.SelectedSkin == "Otto"){
             OttoSkinButton.sprite = OttoSkinButtonGreen;
@@ -1473,6 +1473,6 @@ public class Menu_Handler : MonoBehaviour
         else if(loadeddata.SelectedSkin == "Alien"){
             AlienSkinButton.sprite = AlienSkinButtonGreen;
             Menu_Skin_Display.GetComponent<Image>().sprite = AlienDisplayModel;
-        }
+        } 
     }
 }

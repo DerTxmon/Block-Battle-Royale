@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Zone_Manager : MonoBehaviour
 {
@@ -13,16 +14,15 @@ public class Zone_Manager : MonoBehaviour
     private Transform bottomtransform;
     private Vector3 ZoneSize;
     private Vector3 ZonePosition;
-    public float ZonenSchrumpfGeschwindigkeit = 1;
+    public float ZonenSchrumpfGeschwindigkeit;
     private Vector3 targetZoneSize;
     public bool TakingDamage;
     public float Zoneticktime = 1f;
     public bool InZone;
     public int currentzonedamage = 2;
-    private void Start() {
-        StartCoroutine(ZoneDamage());
-        StartCoroutine(IncreaseZoneDMG());
-    }
+    public int ZoneMoves = 0;
+    public int TimeUntilZone;
+    public TextMeshProUGUI ZoneTimerText;
     private void Awake() {
         instance = this;
 
@@ -35,14 +35,61 @@ public class Zone_Manager : MonoBehaviour
 
         SetZoneSize(new Vector3(0f,0f, -9.199997f), new Vector3(1153.6f,1153.6f, 0f));
     }
+    private void Start(){
+        StartCoroutine(ZonePhasen());
+        StartCoroutine(ZoneDamage());
+        StartCoroutine(IncreaseZoneDMG());
+    }
+    private IEnumerator ZonePhasen(){
+        //Phase 1
+        Debug.Log("Zone Phase 1");
+        targetZoneSize = new Vector3(1153.6f,1153.6f, 0f);
+        //Zähl runter
+        for(TimeUntilZone = 0; TimeUntilZone != 0; TimeUntilZone--){
+            UpdateZoneTimer();
+            yield return new WaitForSeconds(1f);
+        }
+        //Phase 2
+        Debug.Log("Zone Phase 2");
+        targetZoneSize = new Vector3(800f, 800f, 0f);
+        TimeUntilZone = 0;
+        UpdateZoneTimer();
+        yield return new WaitForSeconds(105f); //105 sekunden warten
+        //Zähl runter
+        for(TimeUntilZone = 180; TimeUntilZone != 0; TimeUntilZone--){
+            UpdateZoneTimer();
+            yield return new WaitForSeconds(1f);
+        }/*
+        //Phase 3
+        Debug.Log("Zone Phase 3");
+        targetZoneSize = new Vector3(288.4f,288.4f, 0f);
+        //Zähl runter
+        for(TimeUntilZone = 320; TimeUntilZone != 0; TimeUntilZone--){
+            UpdateZoneTimer();
+            yield return new WaitForSeconds(1f);
+        }*/
+
+        yield return null;
+    }
+    public void UpdateZoneTimer(){
+        //Convert into minutes format
+        int minutes = 0;
+        int seconds = 0;
+        if(TimeUntilZone >= 60){
+            minutes = TimeUntilZone / 60;
+            seconds = TimeUntilZone % 60;
+        }else{
+            seconds = TimeUntilZone;
+        }
+        //Update Text
+        ZoneTimerText.text = minutes.ToString("00") + ":" + seconds.ToString("00");
+    }
 
     void Update(){
         ZonenSchrumf();
     }
 
     void ZonenSchrumf(){
-        targetZoneSize = new Vector3(20f,20f,0f);
-
         Vector3 sizechangeVector = (targetZoneSize - ZoneSize).normalized;
         Vector3 newZoneSize = ZoneSize + sizechangeVector * Time.deltaTime * ZonenSchrumpfGeschwindigkeit;
         SetZoneSize(ZonePosition, newZoneSize);
@@ -77,9 +124,9 @@ public class Zone_Manager : MonoBehaviour
     }
     IEnumerator ZoneDamage(){
         while (true){
-            TakingDamage = true;
+            TakingDamage = true; //??
             if(InZone == true) Player.GetComponent<Player_Health>().Damage(currentzonedamage);
-            TakingDamage = false;
+            TakingDamage = false; //??
             yield return new WaitForSeconds(Zoneticktime);
         }
     }

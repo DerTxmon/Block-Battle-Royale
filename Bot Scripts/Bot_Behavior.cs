@@ -138,7 +138,7 @@ public class Bot_Behavior : MonoBehaviour
             X = Random.Range(-1f,1f);
             Y = Random.Range(-1f,1f);
             waiting1 = false;
-            Debug.Log("Successfully checked for Y");
+            //Debug.Log("Successfully checked for Y");
         }
     }
 
@@ -205,14 +205,14 @@ public class Bot_Behavior : MonoBehaviour
         while(steping){
             if(spawn_steps){ //Mache nur footsteps wenn der Spieler auch nah genug ist um sie in den nächsten 5-10 sekunden zu sehen
                 Instantiate(Footsteps,new Vector3(transform.position.x, transform.position.y, 113f), transform.rotation);
-                yield return new WaitForSeconds(.2f);
+                yield return new WaitForSeconds(.13f);
                 if(!steping) break;
                 Instantiate(Footsteps2, new Vector3(transform.position.x, transform.position.y,113f), transform.rotation);
             }
-            yield return new WaitForSeconds(.2f);
+            yield return new WaitForSeconds(.13f);
         }
         if(!steping){
-            yield return new WaitForSeconds(.2f);
+            yield return new WaitForSeconds(.13f);
             goto begin;
         }
     }
@@ -295,6 +295,12 @@ public class Bot_Behavior : MonoBehaviour
         
     }
 
+    private IEnumerator TurnforXdegrees(int degrees){
+        for(int i = 0; i != degrees; i++){
+            transform.Rotate(0,0,1);
+            yield return new WaitForSeconds(.01f);
+        }
+    }
     public IEnumerator EnemyContactfunc(){
         //Bei Spieler sichutung Augen Kontakt halten
         if(EnemyContact == true && Enemy != null){
@@ -305,10 +311,9 @@ public class Bot_Behavior : MonoBehaviour
                 waiting = false;
             }
 
-            Vector2 lookDir = new Vector2(Enemy.transform.position.x, Enemy.transform.position.y) - rb.position; 
-            angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg + rotationoffset + missaim; 
+            Vector2 lookDir = new Vector2(Enemy.transform.position.x, Enemy.transform.position.y) - rb.position;
+            angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg + rotationoffset + missaim;
             rb.rotation = angle;
-            
 
             //Laufe weg wenn low hp 
             if(Enemy != null && Bot.GetComponent<Bot_Health>().health <= 50 || Bot.GetComponent<Bot_Inventory>().lootcount == 0){
@@ -397,11 +402,6 @@ public class Bot_Behavior : MonoBehaviour
             runaway = false;
             missaim = 0;
             Enemy = null;
-            //Check ob Enemy schon getötet wurde
-            /*inv.Slot1_Selected = false;
-            inv.Slot2_Selected = false;
-            inv.Slot3_Selected = false; //Hand wieder zurück
-            anim.SetBool("Weaponactive", false);*/
         }
         }
     }
